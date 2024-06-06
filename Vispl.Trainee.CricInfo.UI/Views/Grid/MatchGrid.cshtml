@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Vispl.Trainee.CricInfo.VO.MatchVO>
+@{
+    ViewBag.Title = "MatchGrid";
+}
+
+<h2>Match Details</h2>
+
+@using Syncfusion.EJ2.Grids
+
+<div id="MatchGridContainer">
+    @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.MatchVO>("MatchmGrid").DataSource(Model).Columns(col =>
+    {
+        col.Field(p => p.Team1).HeaderText("Team 1").Width("120").Add();
+        col.Field(p => p.Team2).HeaderText("Team 2").Width("200").Add();
+        col.Field(p => p.MatchFormat).HeaderText("Match Format").Width("220").Add();
+        col.Field(p => p.MatchDateTimeZone).HeaderText("Match DateTimeZone").Width("120").Add();
+        col.Field(p => p.Venue).HeaderText("Venue").Width("120").Add();
+    })
+    .AllowPaging(true)
+    .AllowSorting(true)
+    .AllowGrouping(true)
+    .AllowFiltering(true)
+    .PageSettings(page => page.PageSize(5))
+    .Render()
+    )
+</div>
+<div>
+    <button class="btn btn-outline-success"><a href="/Home/CreateMatch" style="text-decoration:none; color: green;">Schedule Match</a></button>
+</div>
+

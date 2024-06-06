@@ -1,0 +1,106 @@
+﻿@model Vispl.Trainee.CricInfo.VO.TeamVO
+@{
+    ViewBag.Title = "Team";
+}
+
+<h2>Add Team</h2>
+@using (Html.BeginForm("CreateTeam", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group">
+        <label>Team Name:</label>
+        @Html.EJS().TextBox("TeamName").Value(Model.TeamName).Render()
+        @Html.ValidationMessageFor(model => model.TeamName, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label>Team Short Name:</label>
+        @Html.EJS().TextBox("TeamShortName").Value(Model.TeamShortName).Render()
+        @Html.ValidationMessageFor(model => model.TeamShortName,"", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label>Team Members:</label>
+        <div>
+            @Html.EJS().MultiSelect("TeamList").Change("playerChange").DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Placeholder("Select team members").MaximumSelectionLength(15).Render()
+            @Html.ValidationMessageFor(model => model.TeamList,"", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Captain:</label>
+        <div>
+            @Html.EJS().DropDownList("Captain").Change("captainChange").Placeholder("Select Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.CaptainNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.ValidationMessageFor(model => model.Captain,"", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Vice Captain:</label>
+        <div>
+            @Html.EJS().DropDownList("ViceCaptain").Placeholder("Select Vice Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.ValidationMessageFor(model => model.ViceCaptain, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Wicket Keeper:</label>
+        <div>
+            @Html.EJS().DropDownList("WicketKeeper").Placeholder("Select WicketKeeper").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.ValidationMessageFor(model => model.WicketKeeper, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Team Icon:</label>
+        <div>
+            @Html.EJS().Uploader("Image").AutoUpload(false).AllowedExtensions(".jpg,.jpeg,.png,.gif").Multiple(false).Render()
+            @Html.ValidationMessageFor(model => model.TeamIcon, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button class="btn btn-outline-success"><a href="/Dashboard/AdminDashboard" style="text-decoration:none; color: green;">Back To Dashboard</a></button>
+        <button type="submit" class="btnsubmit btn-outline-primary">Submit</button>
+    </div>
+
+
+}
+
+<script>
+    function playerChange(args) {
+        var selectedPlayers = args.value;
+        var players = @Html.Raw(Json.Encode(ViewBag.PlayerNames));
+        var captains = @Html.Raw(Json.Encode(ViewBag.CaptainNames));
+
+        var eligibleCaptains = captains.filter(captain => selectedPlayers.includes(captain.Id));
+
+        var captainDropdown = document.getElementById('Captain').ej2_instances[0];
+        captainDropdown.dataSource = eligibleCaptains;
+        captainDropdown.dataBind();
+
+        captainDropdown.enabled = true;
+
+        var wicketKeeperDropdown = document.getElementById('WicketKeeper').ej2_instances[0];
+        var eligiblewicketKeeper = players.filter(player => selectedPlayers.includes(player.Id));
+        wicketKeeperDropdown.dataSource = eligiblewicketKeeper;
+        wicketKeeperDropdown.dataBind();
+
+        wicketKeeperDropdown.enabled = true;
+
+    }
+
+    function captainChange(args) {
+        var selectedCaptainId = args.value;
+        var captains = @Html.Raw(Json.Encode(ViewBag.CaptainNames));
+        var selectedPlayers = document.getElementById('TeamList').ej2_instances[0].value;
+        var players = @Html.Raw(Json.Encode(ViewBag.PlayerNames));
+
+        var eligibleViceCaptains = players.filter(player => selectedPlayers.includes(player.Id) && player.Id !== selectedCaptainId && captains.some(captain => captain.Id === player.Id));
+        var viceCaptainDropdown = document.getElementById('ViceCaptain').ej2_instances[0];
+        viceCaptainDropdown.dataSource = eligibleViceCaptains;
+        viceCaptainDropdown.dataBind();
+
+        viceCaptainDropdown.enabled = true;
+    }
+
+</script>
+

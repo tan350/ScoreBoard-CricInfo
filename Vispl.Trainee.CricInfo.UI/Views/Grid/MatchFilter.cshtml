@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "MatchFilter";
+}
+
+<h2>Filter Scheduled Matches</h2>
+@using (Html.BeginForm("MatchFilter", "Grid", FormMethod.Post, new { id = "matchFilterForm" }))
+{
+    <div>
+        <label>From:</label>
+        @Html.Partial("_DateTimeWithZone", "fromDate")
+    </div>
+    <div>
+        <label>To:</label>
+        @Html.Partial("_DateTimeWithZone", "toDate")
+    </div>
+    <div>
+        <button type="submit" class="btnsubmit btn-outline-primary" style="margin-top: 15px;">Filter Matches</button>
+    </div>
+}
+
+<script>
+    document.getElementById('matchFilterForm').addEventListener('submit', function (e) {
+        let isValid = true;
+
+        const fromDate = document.querySelector('#fromDate').ej2_instances[0].value;
+
+        const toDate = document.querySelector('#toDate').ej2_instances[0].value;
+
+        if (!fromDate) {
+            alert("Please select the 'From' date.");
+            isValid = false;
+        }
+        else if (!toDate) {
+            alert("Please select the 'To' date.");
+            isValid = false;
+        }
+        else if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+            alert("'From' date cannot be later than 'To' date.");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+</script>

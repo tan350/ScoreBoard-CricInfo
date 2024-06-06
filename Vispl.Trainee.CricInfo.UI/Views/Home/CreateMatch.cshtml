@@ -1,0 +1,110 @@
+﻿@model Vispl.Trainee.CricInfo.VO.MatchVO
+
+@{
+    ViewBag.Title = "Match";
+}
+
+<h2>Schedule Match</h2>
+
+@using (Html.BeginForm("CreateMatch", "Home", FormMethod.Post, new { id = "createMatchForm" }))
+{
+    <div class="form-group">
+        <label>Team 1:</label>
+        <div>
+            @Html.EJS().DropDownList("Team1").Change("teamChange").Placeholder("Select Team1").DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(f => f.Value("Id").Text("Value")).Render()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Team 2:</label>
+        <div>
+            @Html.EJS().DropDownList("Team2").Placeholder("Select Team2").DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(f => f.Value("Id").Text("Value")).Render()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Match Format:</label>
+        <div>
+            @Html.EJS().DropDownList("MatchFormat").DataSource(new List<string> { "Test matches", "One-Day matches", "Twenty20 matches" }).Render()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Match Date and Time:</label>
+        <div>
+            @Html.EJS().DateTimePicker("MatchDateTimeZone").Value(Model.MatchDateTimeZone).Render()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Venue:</label>
+        <div>
+            @Html.EJS().TextBox("Venue").Value(Model.Venue).Render()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button class="btn btn-outline-success"><a href="/Dashboard/AdminDashboard" style="text-decoration:none; color: green;">Back To Dashboard</a></button>
+        <button type="submit" class="btnsubmit btn-outline-primary">Submit</button>
+    </div>
+
+}
+
+<script>
+    function teamChange(args) {
+        var selectedTeam1Id = args.value;
+        var Teams = @Html.Raw(Json.Encode(ViewBag.TeamNames));
+
+        var eligibleTeamsForTeam2 = Teams.filter(team => team.Id !== selectedTeam1Id);
+        var team2Dropdown = document.getElementById("Team2").ej2_instances[0];
+        team2Dropdown.dataSource = eligibleTeamsForTeam2;
+        team2Dropdown.dataBind();
+
+        team2Dropdown.enabled = true;
+    }
+
+    document.getElementById('createMatchForm').addEventListener('submit', function (e) {
+        let isValid = true;
+
+        const team1 = document.querySelector('#Team1').ej2_instances[0].value;
+
+        const team2 = document.querySelector('#Team2').ej2_instances[0].value;
+
+        const matchFormat = document.querySelector('#MatchFormat').ej2_instances[0].value;
+
+        const matchDateTime = document.querySelector('#MatchDateTimeZone').ej2_instances[0].value;
+
+        const venue = document.querySelector('#Venue').ej2_instances[0].value;
+
+        if (!team1) {
+            alert("Please select Team 1.");
+            isValid = false;
+        }
+        else if (!team2) {
+            alert("Please select Team 2.");
+            isValid = false;
+        }
+        else if (team1 && team2 && team1 === team2) {
+            alert("Team 1 and Team 2 cannot be the same.");
+            isValid = false;
+        }
+        else if (!matchFormat) {
+            alert("Please select a match format.");
+            isValid = false;
+        }
+        else if (!matchDateTime) {
+            alert("Please select a match date and time.");
+            isValid = false;
+        }
+        else if (!venue) {
+            alert("Please enter the venue.");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+

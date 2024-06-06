@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Vispl.Trainee.CricInfo.VO.TeamVO>
+
+@{
+    ViewBag.Title = "Team Details";
+}
+
+<h2>Team Details</h2>
+
+@using Syncfusion.EJ2.Grids
+
+<div id="TeamGridContainer">
+    @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.TeamVO>("TeamGrid").DataSource(Model).Columns(col =>
+{
+    col.Field(p => p.TeamIcon).HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").Add();
+    col.Field(p => p.TeamName).HeaderText("Team Name").Width("120").Add();
+    col.Field(p => p.TeamShortName).HeaderText("Team Short Name").Width("200").Add();
+    col.Field(p => p.TeamMembers).HeaderText("Team Members").Width("220").Add();
+    col.Field(p => p.Captain).HeaderText("Captain").Width("120").Add();
+    col.Field(p => p.ViceCaptain).HeaderText("Vice Captain").Width("120").Add();
+    col.Field(p => p.WicketKeeper).HeaderText("WicketKeeper").Width("120").Add();
+   
+})
+    .AllowPaging(true)
+    .AllowSorting(true)
+    .AllowGrouping(true)
+    .AllowFiltering(true)
+    .PageSettings(page => page.PageSize(5))
+    .Render()
+    )
+</div>
+<div>
+    <button class="btn btn-outline-success"><a href="/Home/CreateTeam" style="text-decoration:none; color: green;">Add Team</a></button>
+</div>
+
+<style>
+    .pic {
+        height: 55px;
+        width: 55px;
+        border-radius: 50px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+
+

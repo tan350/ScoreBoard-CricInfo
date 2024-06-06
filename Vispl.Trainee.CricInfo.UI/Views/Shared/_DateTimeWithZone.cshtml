@@ -1,0 +1,12 @@
+﻿@model string
+
+<span>
+    @Html.EJS().DateTimePicker(Model).Width("75%").Render()
+    @Html.EJS().DropDownList(Model+"TimeZone").DataSource((IEnumerable<object>)ViewBag.TimeZoneList).Width("25%").Render()
+</span>
+
+<style>
+    span {
+        display: flex;
+    }
+</style>

@@ -1,0 +1,87 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.VO", "Vispl.Trainee.CricInfo.VO\Vispl.Trainee.CricInfo.VO.csproj", "{51EC54AD-3733-45A0-AA03-2D30230CD58A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3} = {89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.DL", "Vispl.Trainee.CricInfo.DL\Vispl.Trainee.CricInfo.DL.csproj", "{44DDED19-1BFD-4A22-91C7-D17B991C3477}"
+	ProjectSection(ProjectDependencies) = postProject
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A} = {51EC54AD-3733-45A0-AA03-2D30230CD58A}
+		{7C78C6A8-A223-4794-8432-E942B9BF2C75} = {7C78C6A8-A223-4794-8432-E942B9BF2C75}
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3} = {89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.BM", "Vispl.Trainee.CricInfo.BM\Vispl.Trainee.CricInfo.BM.csproj", "{1384BDA5-C2FB-45AD-9106-D8512D8AF0A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{44DDED19-1BFD-4A22-91C7-D17B991C3477} = {44DDED19-1BFD-4A22-91C7-D17B991C3477}
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A} = {51EC54AD-3733-45A0-AA03-2D30230CD58A}
+		{7C78C6A8-A223-4794-8432-E942B9BF2C75} = {7C78C6A8-A223-4794-8432-E942B9BF2C75}
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3} = {89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}
+		{D790EF21-50B3-4E64-9D4D-6FEC48622EF9} = {D790EF21-50B3-4E64-9D4D-6FEC48622EF9}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.BM.ITF", "Vispl.Trainee.CricInfo.BM.ITF\Vispl.Trainee.CricInfo.BM.ITF.csproj", "{D790EF21-50B3-4E64-9D4D-6FEC48622EF9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A} = {51EC54AD-3733-45A0-AA03-2D30230CD58A}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.DL.ITF", "Vispl.Trainee.CricInfo.DL.ITF\Vispl.Trainee.CricInfo.DL.ITF.csproj", "{7C78C6A8-A223-4794-8432-E942B9BF2C75}"
+	ProjectSection(ProjectDependencies) = postProject
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A} = {51EC54AD-3733-45A0-AA03-2D30230CD58A}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.RES", "Vispl.Trainee.CricInfo.RES\Vispl.Trainee.CricInfo.RES.csproj", "{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vispl.Trainee.CricInfo.UI", "Vispl.Trainee.CricInfo.UI\Vispl.Trainee.CricInfo.UI.csproj", "{CC7B76EF-3C30-4B99-AD72-2D8EA2C858EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1384BDA5-C2FB-45AD-9106-D8512D8AF0A9} = {1384BDA5-C2FB-45AD-9106-D8512D8AF0A9}
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A} = {51EC54AD-3733-45A0-AA03-2D30230CD58A}
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3} = {89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51EC54AD-3733-45A0-AA03-2D30230CD58A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44DDED19-1BFD-4A22-91C7-D17B991C3477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44DDED19-1BFD-4A22-91C7-D17B991C3477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44DDED19-1BFD-4A22-91C7-D17B991C3477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44DDED19-1BFD-4A22-91C7-D17B991C3477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1384BDA5-C2FB-45AD-9106-D8512D8AF0A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1384BDA5-C2FB-45AD-9106-D8512D8AF0A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1384BDA5-C2FB-45AD-9106-D8512D8AF0A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1384BDA5-C2FB-45AD-9106-D8512D8AF0A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D790EF21-50B3-4E64-9D4D-6FEC48622EF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D790EF21-50B3-4E64-9D4D-6FEC48622EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D790EF21-50B3-4E64-9D4D-6FEC48622EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D790EF21-50B3-4E64-9D4D-6FEC48622EF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C78C6A8-A223-4794-8432-E942B9BF2C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C78C6A8-A223-4794-8432-E942B9BF2C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C78C6A8-A223-4794-8432-E942B9BF2C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C78C6A8-A223-4794-8432-E942B9BF2C75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89B6DC12-CE7A-4D69-A1F3-FAA349D646E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC7B76EF-3C30-4B99-AD72-2D8EA2C858EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC7B76EF-3C30-4B99-AD72-2D8EA2C858EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC7B76EF-3C30-4B99-AD72-2D8EA2C858EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC7B76EF-3C30-4B99-AD72-2D8EA2C858EC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C79DD6A1-A12F-4F7E-9BAB-533B7C430F6F}
+	EndGlobalSection
+EndGlobal

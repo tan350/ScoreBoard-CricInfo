@@ -1,0 +1,7 @@
+{
+  "DataSource": "(localdb)\\MSSqlLocalDb",
+  "Database": "PlayerDB",
+  "IntegratedSecurity": "True",
+  "TrustServerCertificate": "True"
+}
+

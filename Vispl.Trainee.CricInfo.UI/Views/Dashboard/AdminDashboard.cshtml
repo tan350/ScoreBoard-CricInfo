@@ -1,0 +1,114 @@
+﻿
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<h2>Welcome Admin!</h2>
+
+<div class="control-section">
+    @Html.EJS().DashboardLayout("DashLayout").Columns(6).ContentTemplate(@<div>
+    <div id="Dashboard" class="e-panel" data-row="0" data-col="0" data-sizeX="1" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-home"></span>
+                @Html.ActionLink("Home", "Dashboard", "Dashboard")
+            </div>
+        </div>
+    </div>
+    <div id="PlayerDetail" class="e-panel" data-row="0" data-col="3" data-sizeX="2" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-people"></span>
+                @Html.ActionLink("View Players", "PlayerGrid", "Grid")
+            </div>
+            <div>
+                <span>Total Players: @ViewBag.playerCount</span>
+            </div>
+        </div>
+    </div>
+    <div id="TeamDetail" class="e-panel" data-row="1" data-col="3" data-sizeX="2" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-people"></span>
+                @Html.ActionLink("View Teams", "TeamGrid", "Grid")
+            </div>
+            <div>
+                <span>Total Teams: @ViewBag.teamCount</span>
+            </div>
+        </div>
+    </div>
+    <div id="MatchDetail" class="e-panel" data-row="2" data-col="3" data-sizeX="2" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-eye"></span>
+                @Html.ActionLink("View Scheduled Matches", "MatchGrid", "Grid")
+            </div>
+            <div>
+                <span>Total Matches: @ViewBag.matchesCount</span>
+            </div>
+        </div>
+    </div>
+    <div id="CreatePlayer" class="e-panel" data-row="0" data-col="1" data-sizeX="2" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-circle-add"></span>
+                @Html.ActionLink("Add Player", "CreatePlayer", "Home")
+            </div>
+        </div>
+    </div>
+    <div id="CreateTeam" class="e-panel" data-row="1" data-col="0" data-sizeX="3" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-circle-add"></span>
+                @Html.ActionLink("Add Team", "CreateTeam", "Home")
+            </div>
+        </div>
+    </div>
+    <div id="CreateMatch" class="e-panel" data-row="2" data-col="1" data-sizeX="2" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-month-agenda"></span>
+                @Html.ActionLink("Schedule Match", "CreateMatch", "Home")
+            </div>
+        </div>
+    </div>
+    <div id="FilterMatchDetail" class="e-panel" data-row="3" data-col="0" data-sizeX="1" data-sizeY="1">
+        <div class="e-panel-container">
+            <div class="text-align">
+                <span class="e-icons e-filter"></span>
+                @Html.ActionLink("Filter Matches", "MatchFilter", "Grid")
+            </div>
+        </div>
+    </div>
+</div>).Render()
+</div>
+<style>
+    #DashLayout {
+        padding: 10px;
+    }
+
+        #DashLayout .e-panel .e-panel-container {
+            vertical-align: middle;
+            font-weight: 600;
+            font-size: 20px;
+            text-align: center;
+            background-color: rgb(214, 178, 183);
+        }
+
+    .text-align {
+        line-height: 100px;
+    }
+
+    a {
+        color: Black;
+        text-decoration: none;
+        background-color: transparent;
+    }
+   
+
+    .e-icons {
+        color: black;
+        font-size: 25px !important;
+    }
+</style>
+

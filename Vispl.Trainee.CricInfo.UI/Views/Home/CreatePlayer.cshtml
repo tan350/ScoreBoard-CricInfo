@@ -1,0 +1,330 @@
+@model Vispl.Trainee.CricInfo.VO.PlayerVO
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>Add Player</h2>
+
+@using (Html.BeginForm("CreatePlayer", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "createPlayerForm" }))
+{
+    <div class="containerdiv">
+        <div class="section left">
+            <div class="form-group">
+                <label>Jersey No.:</label>
+                @Html.EJS().TextBox("JerseyNo").Value(Model.JerseyNo.ToString()).Render()
+
+            </div>
+
+            <div class="form-group">
+                <label>Name:</label>
+                @Html.EJS().TextBox("Name").Value(Model.Name).Render()
+
+            </div>
+
+            <div class="form-group">
+                <label>Date Of Birth:</label>
+                @Html.EJS().DateTimePicker("DateOfBirth").Change("onDOBChange").Value(Model.DateOfBirth).Render()
+
+            </div>
+
+            <div class="form-group">
+                <label>Age:</label>
+                @Html.EJS().NumericTextBox("Age").Placeholder("Age").Format("###").Min(13).Value(Model.Age).Enabled(false).Render()
+
+            </div>
+
+            <div class="form-group">
+                <label>BirthPlace:</label>
+                @Html.EJS().TextBox("BirthPlace").Value(Model.BirthPlace).Render()
+
+            </div>
+
+            <div class="form-group">
+                <label>Player Type:</label>
+                <div>
+                    @Html.EJS().CheckBox("PlayerTypeFielder").Label("Fielder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeFielder").Checked(@Model.PlayerTypeFielder).Change("onFielderChange").Render()
+
+                    @Html.EJS().CheckBox("PlayerTypeBowler").Label("Bowler").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeBowler").Checked(@Model.PlayerTypeBowler).Change("onBowlerChange").Render()
+
+                    @Html.EJS().CheckBox("PlayerTypeBatsman").Label("Batsman").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeBatsman").Checked(@Model.PlayerTypeBatsman).Change("onBatsmanChange").Render()
+
+                    @Html.EJS().CheckBox("PlayerTypeAllRounder").Label("AllRounder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeAllRounder").Checked(@Model.PlayerTypeAllRounder).Change("handleAllrounderChange").Render()
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label>Is Captain:</label>
+                @Html.EJS().RadioButton("IsCaptainYes").Label("Yes").Name("IsCaptain").Value((!Model.IsCaptain).ToString()).Checked(!Model.IsCaptain).Render()
+                @Html.EJS().RadioButton("IsCaptainNo").Label("No").Name("IsCaptain").Value(Model.IsCaptain.ToString()).Checked(Model.IsCaptain).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Nationality:</label>
+                <div>
+                    @Html.EJS().DropDownList("Nationality").DataSource((IEnumerable<object>)ViewBag.NationalityList).Placeholder("Select a Nationality").Value(Model.Nationality).Render()
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label>Team:</label>
+                @Html.EJS().DropDownList("Team").Value(Model.Team).DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "Id", Text="Value" }).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Matches Played:</label>
+                @Html.EJS().NumericTextBox("MatchesPlayed").Min(0).Value(Model.MatchesPlayed).Render()
+            </div>
+        </div>
+
+
+        <div class="section right">
+
+            <div class="form-group">
+                <label>Runs Scored:</label>
+                @Html.EJS().NumericTextBox("RunsScored").Min(0).Value(Model.RunsScored).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Wickets Taken:</label>
+                @Html.EJS().NumericTextBox("WicketsTaken").Min(0).Value(Model.WicketsTaken).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Batting Average:</label>
+                @Html.EJS().NumericTextBox("BattingAverage").Min(0).Value(Model.BattingAverage).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Bowling Average:</label>
+                @Html.EJS().NumericTextBox("BowlingAverage").Min(0).Value(Model.BowlingAverage).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Centuries:</label>
+                @Html.EJS().NumericTextBox("Centuries").Min(0).Value(Model.Centuries).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Half Centuries:</label>
+                @Html.EJS().NumericTextBox("HalfCenturies").Min(0).Value(Model.HalfCenturies).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Debut Date:</label>
+                @Html.EJS().DateTimePicker("DebutDate").Value(Model.DebutDate).Render()
+            </div>
+
+            <div class="form-group">
+                <label>ICC Ranking:</label>
+                @Html.EJS().NumericTextBox("ICCRanking").Min(0).Value(Model.ICCRanking).Render()
+            </div>
+
+            <div class="form-group">
+                <label>Upload Picture:</label>
+                <div>
+                    @Html.EJS().Uploader("Image").AutoUpload(false).AllowedExtensions(".jpg,.jpeg,.png,.gif").Multiple(false).Render()
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btnsubmit btn-outline-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button class="btn btn-outline-success"><a href="/Dashboard/AdminDashboard" style="text-decoration:none; color: green;">Back To Dashboard</a></button>
+    </div>
+}
+
+<script>
+    document.getElementById('createPlayerForm').addEventListener('submit', function (e) {
+        let isValid = true;
+        const errorMessages = [];
+
+        const jerseyNo = document.querySelector('#JerseyNo').ej2_instances[0].value;
+        const name = document.querySelector('#Name').ej2_instances[0].value;
+        const dateOfBirth = document.querySelector('#DateOfBirth').ej2_instances[0].value;
+        const birthPlace = document.querySelector('#BirthPlace').ej2_instances[0].value;
+        const nationality = document.querySelector('#Nationality').ej2_instances[0].value;
+        const imageUploader = document.querySelector('#Image').ej2_instances[0];
+        const files = imageUploader.getFilesData();
+
+        if (!jerseyNo) {
+            errorMessages.push("Please enter the Jersey No.");
+            isValid = false;
+        }
+        else if (!name) {
+            errorMessages.push("Please enter the Name.");
+            isValid = false;
+        }
+        else if (!dateOfBirth) {
+            errorMessages.push("Please select the Date of Birth.");
+            isValid = false;
+        }
+        else if (!birthPlace) {
+            errorMessages.push("Please enter the BirthPlace.");
+            isValid = false;
+        }
+        else if (!nationality) {
+            errorMessages.push("Please select a Nationality.");
+            isValid = false;
+        }
+        else if (files.length > 0) {
+            const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+            const fileExtension = files[0].type.split('/').pop().toLowerCase();
+            if (!allowedExtensions.includes('.' + fileExtension)) {
+                errorMessages.push("Invalid file type for image. Allowed: .jpg, .jpeg, .png, .gif");
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert(errorMessages.join('\n'));
+        }
+    });
+
+
+    function handleAllrounderChange(args) {
+        if (args.checked) {
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].checked = false;
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].checked = false;
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].checked = false;
+            document.getElementById("PlayerTypeAllRounder").ej2_instances[0].value = true;
+
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].disabled = true;
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].disabled = true;
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].disabled = true;
+        } else {
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].checked = true;
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].checked = true;
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].checked = true;
+
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].value = true;
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].value = true;
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].value = true;
+
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].disabled = false;
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].disabled = false;
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].disabled = false;
+        }
+    }
+
+    function onBatsmanChange(args) {
+        if (args.checked) {
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].value = true;
+        }else{
+            document.getElementById("PlayerTypeBatsman").ej2_instances[0].value = false;
+        }
+    }
+
+    function onFielderChange(args) {
+        if (!args.checked) {
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].value = false;
+        } else {
+            document.getElementById("PlayerTypeFielder").ej2_instances[0].value = true;
+        }
+    }
+
+    function onBowlerChange(args) {
+        if (args.checked) {
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].value = true;
+        } else {
+            document.getElementById("PlayerTypeBowler").ej2_instances[0].value = false;
+        }
+    }
+
+    function onDOBChange(args) {
+        var dob = args.value;
+        if (dob) {
+            var today = new Date();
+            var age = today.getFullYear() - dob.getFullYear();
+            var monthDifference = today.getMonth() - dob.getMonth();
+
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            var ageNumericTextBox = document.getElementById('Age').ej2_instances[0];
+            ageNumericTextBox.value = age;
+            ageNumericTextBox.dataBind();
+        }
+    }
+
+</script>
+
+
+
+<style>
+
+    .containerdiv {
+        display: flex;
+        width: 80%;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .section {
+        flex: 1;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .left {
+        border-right: 1px solid #ddd;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-group .e-input-group, .form-group .e-control-wrapper {
+            width: 100%;
+        }
+
+        .form-group .e-checkbox-wrapper, .form-group .e-radio-wrapper {
+            margin-right: 10px;
+        }
+
+            .form-group .e-checkbox-wrapper:last-child, .form-group .e-radio-wrapper:last-child {
+                margin-right: 0;
+            }
+
+    .btnsubmit {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>-

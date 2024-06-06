@@ -1,0 +1,44 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>User Authentication</title>
+    <link rel="stylesheet" type="text/css" href="~/Content/UserAuthentication.css" />
+</head>
+<body>
+    <div class="form-container">
+        <div class="image-container">
+            <img src="~/Content/UserLoginLogo.jfif" alt="Login Logo" />
+        </div>
+        <form class="form" action="@Url.Action("Login", "UserAuthentication")" method="post">
+            <div class="field-container">
+                <label for="userType">User Type</label>
+                <select id="UserRole" name="UserRole">
+                    <option value="Admin">Admin</option>
+                </select>
+
+                <label for="username">Username</label>
+                <input type="text" id="UserName" name="UserName" placeholder="Enter your username" required />
+
+                <label for="password">Password</label>
+                <input type="password" id="Password" name="Password" placeholder="Enter your password" required />
+
+                <button type="submit">Login</button>
+                @if(!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("ekey") || ViewData.ModelState.ContainsKey("e2key"))
+                { 
+                    <label id="errorMessage" style="color:red">
+                        @Html.ValidationMessage("ekey")
+                    </label>
+                }
+
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+
+
+
