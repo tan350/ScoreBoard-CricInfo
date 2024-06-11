@@ -38,7 +38,7 @@
         <label>Vice Captain:</label>
         <div>
             @Html.EJS().DropDownList("ViceCaptain").Placeholder("Select Vice Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Render()
-            @Html.ValidationMessageFor(model => model.ViceCaptain, "", new { @class = "text-danger" })
+            
         </div>
     </div>
 
@@ -53,7 +53,6 @@
         <label>Team Icon:</label>
         <div>
             @Html.EJS().Uploader("Image").AutoUpload(false).AllowedExtensions(".jpg,.jpeg,.png,.gif").Multiple(false).Render()
-            @Html.ValidationMessageFor(model => model.TeamIcon, "", new { @class = "text-danger" })
         </div>
     </div>
 

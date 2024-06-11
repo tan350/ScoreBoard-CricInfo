@@ -1,6 +1,6 @@
 {
   "DataSource": "(localdb)\\MSSqlLocalDb",
-  "Database": "PlayerDB",
+  "Database": "CricInfoDB",
   "IntegratedSecurity": "True",
   "TrustServerCertificate": "True"
 }

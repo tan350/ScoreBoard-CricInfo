@@ -11,6 +11,5 @@ namespace Vispl.Trainee.CricInfo.BM.ITF
         string[] GetNationality();
         List<PlayerListVO> GetPlayerNames();
         List<PlayerListVO> GetCaptainNames();
-        void Dispose();
     }
 }

@@ -33,6 +33,7 @@
         <label>Match Date and Time:</label>
         <div>
             @Html.EJS().DateTimePicker("MatchDateTimeZone").Value(Model.MatchDateTimeZone).Render()
+            @Html.EJS().DropDownList("MatchOffset").DataSource((IEnumerable<object>)ViewBag.Offset).Fields(f => f.Value("value").Text("Text")).Render()
         </div>
     </div>
 

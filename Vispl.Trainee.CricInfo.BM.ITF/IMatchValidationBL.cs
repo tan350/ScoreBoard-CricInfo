@@ -13,5 +13,6 @@ namespace Vispl.Trainee.CricInfo.BM.ITF
         void Save(MatchVO record);
         string[] GetTimezones();
         List<TeamListVO> GetTeamNamesList();
+        List<object> GetTimezonesList();
     }
 }

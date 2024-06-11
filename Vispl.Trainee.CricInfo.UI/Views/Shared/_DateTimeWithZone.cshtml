@@ -2,7 +2,7 @@
 
 <span>
     @Html.EJS().DateTimePicker(Model).Width("75%").Render()
-    @Html.EJS().DropDownList(Model+"TimeZone").DataSource((IEnumerable<object>)ViewBag.TimeZoneList).Width("25%").Render()
+    @Html.EJS().DropDownList(Model+ "Offset").DataSource((IEnumerable<object>)ViewBag.Offset).Fields(f => f.Value("value").Text("Text")).Width("25%").Render()
 </span>
 
 <style>

@@ -15,14 +15,28 @@ namespace Vispl.Trainee.CricInfo.BM
         ITeamSqlDL TeamSqlDLObject;
         public List<TeamVO> ReadAllRecordsData()
         {
-            TeamSqlDLObject = new TeamSqlDL();
-            return TeamSqlDLObject.ReadAllRecords();
+            try
+            {
+                TeamSqlDLObject = new TeamSqlDL();
+                return TeamSqlDLObject.ReadAllRecords();
+            }
+            finally
+            {
+                TeamSqlDLObject = null;
+            }
         }
 
         public void Save(TeamVO record)
         {
-            TeamSqlDLObject = new TeamSqlDL();
-            TeamSqlDLObject.AddRecord(record);
+            try
+            {
+                TeamSqlDLObject = new TeamSqlDL();
+                TeamSqlDLObject.AddRecord(record);
+            }
+            finally
+            {
+                TeamSqlDLObject = null;
+            }
         }
 
         public void Dispose()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,31 +16,79 @@ namespace Vispl.Trainee.CricInfo.BM
         IMatchSqlDL MatchSqlDLObject;
         public List<MatchVO> ReadAllRecordsData()
         {
-            MatchSqlDLObject = new MatchSqlDL();
-            return MatchSqlDLObject.ReadAllRecords();
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                return MatchSqlDLObject.ReadAllRecords();
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
         }
 
         public void Save(MatchVO record)
         {
-            MatchSqlDLObject = new MatchSqlDL();
-            MatchSqlDLObject.AddRecord(record);
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                MatchSqlDLObject.AddRecord(record);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
         }
 
         public string[] GetTimezones() 
         {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                return MatchSqlDLObject.GetTimezoneList();
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+        }
+
+        public List<object> GetTimezonesList()
+        {
             MatchSqlDLObject = new MatchSqlDL();
-            return MatchSqlDLObject.GetTimezoneList();
+
+            using (DataTable table = MatchSqlDLObject.GetZones())
+            {
+                try
+                {
+                    List<object> details = new List<object>();
+                    string name;
+                    string id;
+                    foreach (DataRow row in table.Rows)
+                    {
+                        name = row["TimeZone"].ToString();
+                        id = row["Offset"].ToString();
+
+                        details.Add(new { Text = name + " " + id, value = id });
+                    }
+                    return details;
+                }
+                finally
+                {
+                    MatchSqlDLObject = null;
+                }
+            }
+
         }
 
         public List<TeamListVO> GetTeamNamesList()
         {
-            MatchSqlDLObject = new MatchSqlDL();
-            return MatchSqlDLObject.GetTeamList();
-        }
-
-        public void Dispose()
-        {
-            if (MatchSqlDLObject != null)
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                return MatchSqlDLObject.GetTeamList();
+            }
+            finally
             {
                 MatchSqlDLObject = null;
             }

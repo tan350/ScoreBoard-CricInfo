@@ -17,31 +17,66 @@ namespace Vispl.Trainee.CricInfo.BM
 
         public List<PlayerVO> ReadAllRecordsData()
         {
-            PlayerSqlDLObject = new PlayerSqlDL();
-            return PlayerSqlDLObject.ReadAllRecords();
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.ReadAllRecords();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
         }
 
         public void Save(PlayerVO record)
         {
-            PlayerSqlDLObject = new PlayerSqlDL();
-            PlayerSqlDLObject.AddRecord(record);
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                PlayerSqlDLObject.AddRecord(record);
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
         }
 
         public string[] GetNationality()
         {
-            PlayerSqlDLObject = new PlayerSqlDL();
-            return PlayerSqlDLObject.GetNationalityList();
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.GetNationalityList();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
         }
 
         public List<PlayerListVO> GetPlayerNames()
         {
-            PlayerSqlDLObject = new PlayerSqlDL();
-            return PlayerSqlDLObject.GetPlayersNameList();
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.GetPlayersNameList();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
         }
         public List<PlayerListVO> GetCaptainNames()
         {
-            PlayerSqlDLObject = new PlayerSqlDL();
-            return PlayerSqlDLObject.GetCaptainNameList();
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.GetCaptainNameList();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
         }
 
         

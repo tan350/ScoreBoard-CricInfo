@@ -17,44 +17,6 @@ namespace Vispl.Trainee.CricInfo.DL
     {
         string connectionString = ConnectionStringManager.GetConnectionString();
 
-        public DataTable ReadRecordsInDataTable()
-        {
-            DataTable dataTable = new DataTable();
-            string queryString = "SELECT * FROM Teams;";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
-                connection.Open();
-                adapter.Fill(dataTable);
-            }
-
-            return dataTable;
-        }
-
-        private List<TeamVO> ConvertDataTableToTeamVOList(DataTable dataTable)
-        {
-            var TeamList = new List<TeamVO>();
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var team = new TeamVO
-                {
-                    TeamID = Convert.ToInt32(row["TeamID"]),
-                    TeamName = row["TeamName"].ToString(),
-                    TeamShortName = row["TeamShortName"].ToString(),
-                    TeamMembers = row["TeamMembers"].ToString(),
-                    Captain = row["Captain"].ToString(),
-                    ViceCaptain = row["ViceCaptain"].ToString(),
-                    WicketKeeper = row["WicketKeeper"].ToString(),
-                    TeamIcon = row["TeamIcon"] as byte[]
-                };
-                TeamList.Add(team);
-            }
-
-            return TeamList;
-        }
-
         public List<TeamVO> ReadAllRecords()
         {
             DataTable dataTable = new DataTable();
@@ -63,27 +25,36 @@ namespace Vispl.Trainee.CricInfo.DL
             SqlConnection connection = new SqlConnection(connectionString);
             SqlCommand command = new SqlCommand(queryString, connection);
             SqlDataAdapter adapter = new SqlDataAdapter(command);
-            connection.Open();
-            adapter.Fill(dataTable);
 
             var records = new List<TeamVO>();
-
-            foreach (DataRow row in dataTable.Rows)
+            try
             {
-                var team = new TeamVO
+                connection.Open();
+                adapter.Fill(dataTable);
+
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    TeamID = Convert.ToInt32(row["TeamID"]),
-                    TeamName = row["TeamName"].ToString(),
-                    TeamShortName = row["TeamShortName"].ToString(),
-                    TeamMembers = row["TeamMembers"].ToString(),
-                    Captain = row["Captain"].ToString(),
-                    ViceCaptain = row["ViceCaptain"].ToString(),
-                    WicketKeeper = row["WicketKeeper"].ToString(),
-                    TeamIcon = row["TeamIcon"] as byte[]
-                };
-                records.Add(team);
+                    var team = new TeamVO
+                    {
+                        TeamID = Convert.ToInt32(row["TeamID"]),
+                        TeamName = row["TeamName"].ToString(),
+                        TeamShortName = row["TeamShortName"].ToString(),
+                        TeamMembers = row["TeamMembers"].ToString(),
+                        Captain = row["Captain"].ToString(),
+                        ViceCaptain = row["ViceCaptain"].ToString(),
+                        WicketKeeper = row["WicketKeeper"].ToString(),
+                        TeamIcon = row["TeamIcon"] as byte[]
+                    };
+                    records.Add(team);
+                }
             }
-            ReleaseAndDispose(adapter, dataTable, command);
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                adapter.Dispose();
+                ReleaseAndDispose(adapter, dataTable, command);
+            }
 
             return  records;
         }
@@ -91,31 +62,74 @@ namespace Vispl.Trainee.CricInfo.DL
 
         public void AddRecord(TeamVO record)
         {
-            string players = string.Join(",", record.TeamList);
             string queryString1 = "SELECT MAX(TeamID) FROM Teams;";
             int result = 0;
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                using(var command = new SqlCommand(queryString1, connection))
+                try
                 {
-                     result = (int)command.ExecuteScalar();
+                    connection.Open();
+                    using (var command = new SqlCommand(queryString1, connection))
+                    {
+                        var scalarResult = command.ExecuteScalar();
+                        if (scalarResult != DBNull.Value && scalarResult != null)
+                        {
+                            result = Convert.ToInt32(scalarResult);
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
+
+
+            string players = string.Join(",", record.TeamList);
+            string query = $"SELECT Name FROM Players WHERE PlayerId IN ({players})";
+
+            List<string> playerNames = new List<string>();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                playerNames.Add(reader.GetString(0));
+                            }
+                        }
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+
+            string playersNameJoin = string.Join(",", playerNames);
+
+
 
             string queryString = @"INSERT INTO Teams (TeamName,TeamShortName, TeamMembers, Captain, ViceCaptain, WicketKeeper, TeamIcon)
                            VALUES (@TeamName,@TeamShortName, @TeamMembers, @Captain, @ViceCaptain, @WicketKeeper, @TeamIcon);";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand(queryString, connection))
+                SqlCommand command = new SqlCommand(queryString, connection);
+
+                try
                 {
+                    connection.Open();
 
                     command.Parameters.AddWithValue("@TeamName", record.TeamName);
                     command.Parameters.AddWithValue("@TeamShortName", record.TeamShortName);
-                    command.Parameters.AddWithValue("@TeamMembers", players);
+                    command.Parameters.AddWithValue("@TeamMembers", playersNameJoin);
                     command.Parameters.AddWithValue("@Captain", record.Captain);
                     command.Parameters.AddWithValue("@ViceCaptain", record.ViceCaptain);
                     command.Parameters.AddWithValue("@WicketKeeper", record.WicketKeeper);
@@ -126,16 +140,22 @@ namespace Vispl.Trainee.CricInfo.DL
                     command.Parameters.Add("@TeamIcon", SqlDbType.VarBinary, -1).Value = (object)record.TeamIcon ?? DBNull.Value;
 
                     command.ExecuteNonQuery();
-                }
 
-                foreach (var individualplayer in record.TeamList)
-                {
-                    using (SqlCommand commandPlayer = new SqlCommand(@"UPDATE Players SET TeamId = @TeamId WHERE PlayerId = @PlayerId", connection))
+                    foreach (var individualplayer in record.TeamList)
                     {
-                        commandPlayer.Parameters.AddWithValue("@TeamId", result+1);
-                        commandPlayer.Parameters.AddWithValue("@PlayerId", individualplayer);
-                        commandPlayer.ExecuteNonQuery();
+                        using (SqlCommand commandPlayer = new SqlCommand(@"UPDATE Players SET TeamId = @TeamId WHERE PlayerId = @PlayerId", connection))
+                        {
+                            commandPlayer.Parameters.AddWithValue("@TeamId", result + 1);
+                            commandPlayer.Parameters.AddWithValue("@PlayerId", individualplayer);
+                            commandPlayer.ExecuteNonQuery();
+                        }
                     }
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
                 }
 
 

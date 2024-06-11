@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -21,17 +22,26 @@ namespace Vispl.Trainee.CricInfo.DL
             {
                 SqlCommand command = new SqlCommand(queryString, connection);
 
-                command.Parameters.AddWithValue("@UserName", user.UserName);
-                command.Parameters.AddWithValue("@UserPassword", user.Password);
-                command.Parameters.AddWithValue("@UserRole", user.UserRole);
-
-                connection.Open();
-
-                int count = (int)command.ExecuteScalar();
-
-                if (count == 0)
+                try
                 {
-                    user.ErrorMessage = "Credential not valid";
+                    command.Parameters.AddWithValue("@UserName", user.UserName);
+                    command.Parameters.AddWithValue("@UserPassword", user.Password);
+                    command.Parameters.AddWithValue("@UserRole", user.UserRole);
+
+                    connection.Open();
+
+                    int count = (int)command.ExecuteScalar();
+
+                    if (count == 0)
+                    {
+                        user.ErrorMessage = "Credential not valid";
+                    }
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
         }

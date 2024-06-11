@@ -13,6 +13,7 @@ namespace Vispl.Trainee.CricInfo.VO
         public string Team2 { get; set; }
         public string MatchFormat { get; set; }
         public DateTime MatchDateTimeZone { get; set; }
+        public string MatchOffset { get; set; }
         public string Venue { get; set; }
     }
 }

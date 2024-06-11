@@ -17,40 +17,91 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
         // GET: Grid
         public ActionResult PlayerGrid()
         {
-            ValidationBLObject = new ValidationBL();
-            var players = ValidationBLObject.ReadAllRecordsData();
-            return View(players);
+            try
+            {
+                ValidationBLObject = new ValidationBL();
+                var players = ValidationBLObject.ReadAllRecordsData();
+                return View(players);
+            }
+            finally
+            {
+                if (ValidationBLObject != null)
+                {
+                    ValidationBLObject = null;
+                }
+            }
         }
 
         public ActionResult TeamGrid()
         {
-            TeamValidationBLObject = new TeamValidationBL();
-            var teams = TeamValidationBLObject.ReadAllRecordsData();
-            return View(teams);
+            try
+            {
+                TeamValidationBLObject = new TeamValidationBL();
+                var teams = TeamValidationBLObject.ReadAllRecordsData();
+                return View(teams);
+            }
+            finally
+            {
+                if (TeamValidationBLObject != null)
+                {
+                    TeamValidationBLObject = null;
+                }
+            }
         }
 
         public ActionResult MatchGrid()
         {
-            MatchValidationBLObject = new MatchValidationBL();
-            var matches = MatchValidationBLObject.ReadAllRecordsData();
-            return View(matches);
+            try
+            {
+                MatchValidationBLObject = new MatchValidationBL();
+                var matches = MatchValidationBLObject.ReadAllRecordsData();
+                return View(matches);
+            }
+            finally
+            {
+                if (MatchValidationBLObject != null)
+                {
+                    MatchValidationBLObject = null;
+                }
+            }
         }
 
         public ActionResult MatchFilter()
         {
-            MatchValidationBLObject = new MatchValidationBL();
-            ViewBag.TimeZoneList = MatchValidationBLObject.GetTimezones();
+            try
+            {
+                MatchValidationBLObject = new MatchValidationBL();
+                ViewBag.Offset = MatchValidationBLObject.GetTimezonesList();
 
-            return View();
+
+                return View();
+            }
+            finally
+            {
+                if (MatchValidationBLObject != null)
+                {
+                    MatchValidationBLObject = null;
+                }
+            }
         }
 
         [HttpPost]
         public ActionResult MatchFilter(DateTime fromDate, DateTime toDate)
         {
-            MatchValidationBLObject = new MatchValidationBL();
-            List<MatchVO> matches = MatchValidationBLObject.ReadAllRecordsData().Where(m => m.MatchDateTimeZone >= fromDate && m.MatchDateTimeZone <= toDate).ToList();
+            try
+            {
+                MatchValidationBLObject = new MatchValidationBL();
+                List<MatchVO> matches = MatchValidationBLObject.ReadAllRecordsData().Where(m => m.MatchDateTimeZone >= fromDate && m.MatchDateTimeZone <= toDate).ToList();
 
-            return View("~/Views/Grid/MatchGrid.cshtml", matches);
+                return View("~/Views/Grid/MatchGrid.cshtml", matches);
+            }
+            finally
+            {
+                if (MatchValidationBLObject != null)
+                {
+                    MatchValidationBLObject = null;
+                }
+            }
         }
     }
 }

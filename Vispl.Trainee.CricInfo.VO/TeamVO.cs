@@ -24,14 +24,11 @@ namespace Vispl.Trainee.CricInfo.VO
 
         [Required(ErrorMessage = "Captain is required.")]
         public string Captain { get; set; }
-
-        [Required(ErrorMessage = "Vice-captain is required.")]
         public string ViceCaptain { get; set; }
 
         [Required(ErrorMessage = "Wicket-keeper is required.")]
         public string WicketKeeper { get; set; }
 
-        [Required(ErrorMessage = "Team icon is required.")]
         public byte[] TeamIcon { get; set; }
     }
 

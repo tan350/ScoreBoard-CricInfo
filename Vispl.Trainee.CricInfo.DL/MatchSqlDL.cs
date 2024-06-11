@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using Vispl.Trainee.CricInfo.DL.ITF;
@@ -21,29 +22,34 @@ namespace Vispl.Trainee.CricInfo.DL
             string queryString = "SELECT * FROM Matches;";
 
             SqlConnection connection = new SqlConnection(connectionString);
-
-
             SqlCommand command = new SqlCommand(queryString, connection);
-            connection.Open();
-
-            SqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                MatchVO record = new MatchVO
-                {
-                    MatchID = Convert.ToInt32(reader["MatchID"]),
-                    Team1 = reader["Team1"].ToString(),
-                    Team2 = reader["Team2"].ToString(),
-                    MatchFormat = reader["MatchFormat"].ToString(),
-                    MatchDateTimeZone = Convert.ToDateTime(reader["MatchDateTimeZone"]),
-                    Venue = reader["Venue"].ToString()
-                };
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
 
-                records.Add(record);
+                while (reader.Read())
+                {
+                    MatchVO record = new MatchVO
+                    {
+                        MatchID = Convert.ToInt32(reader["MatchID"]),
+                        Team1 = reader["Team1"].ToString(),
+                        Team2 = reader["Team2"].ToString(),
+                        MatchFormat = reader["MatchFormat"].ToString(),
+                        MatchDateTimeZone = ((DateTimeOffset)reader["MatchDateTimeZone"]).DateTime,
+                        Venue = reader["Venue"].ToString()
+                    };
+
+                    records.Add(record);
+                }
+                reader.Close();
+                ReleaseAndDispose(reader, command);
             }
-            reader.Close();
-            ReleaseAndDispose(reader, command);
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
 
             return records;
         }
@@ -56,24 +62,71 @@ namespace Vispl.Trainee.CricInfo.DL
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
+
                 SqlCommand command = new SqlCommand(queryString, connection);
-
-                command.Parameters.AddWithValue("@Team1", record.Team1);
-                command.Parameters.AddWithValue("@Team2", record.Team2);
-                command.Parameters.AddWithValue("@MatchFormat", record.MatchFormat);
-                if (record.MatchDateTimeZone == null || record.MatchDateTimeZone == DateTime.MinValue)
+                try
                 {
-                    command.Parameters.AddWithValue("@MatchDateTimeZone", DateTime.Now);
+                    command.Parameters.AddWithValue("@Team1", record.Team1);
+                    command.Parameters.AddWithValue("@Team2", record.Team2);
+                    command.Parameters.AddWithValue("@MatchFormat", record.MatchFormat);
+                    DateTimeOffset matchDateTimeOffset;
+                    if (record.MatchDateTimeZone == null || record.MatchDateTimeZone == DateTime.MinValue)
+                    {
+                        matchDateTimeOffset = DateTimeOffset.Now;
+                    }
+                    else
+                    {
+                        TimeSpan offset;
+                        if (!TimeSpan.TryParse(record.MatchOffset, out offset))
+                        {
+                            throw new ArgumentException("Invalid offset format", nameof(record.MatchOffset));
+                        }
+
+                        matchDateTimeOffset = new DateTimeOffset(record.MatchDateTimeZone, offset);
+                    }
+
+                    command.Parameters.AddWithValue("@MatchDateTimeZone", matchDateTimeOffset);
+                    command.Parameters.AddWithValue("@Venue", record.Venue);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
                 }
-                else
+                finally
                 {
-                    command.Parameters.AddWithValue("@MatchDateTimeZone", record.MatchDateTimeZone);
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
                 }
 
-                command.Parameters.AddWithValue("@Venue", record.Venue);
+            }
+        }
 
-                connection.Open();
-                command.ExecuteNonQuery();
+
+        public DataTable GetZones()
+        {
+            using(DataTable table = new DataTable())
+            {
+                string query = "Select TimeZone,Offset From TimeZones;";
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    using(SqlDataAdapter adapter = new SqlDataAdapter(query,connection))
+                    {
+                        try
+                        {
+                            connection.Open();
+                            adapter.Fill(table);
+                            return table;
+                        }
+                        finally
+                        {
+                            connection.Close();
+                            connection.Dispose();
+                            adapter.Dispose();
+                            table.Dispose();
+                        }
+                    }
+                }
             }
         }
 
@@ -82,18 +135,28 @@ namespace Vispl.Trainee.CricInfo.DL
             List<string> timezones = new List<string>();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "Select TimeZone From TimeZones;";
+                string query = "Select TimeZone,Offset From TimeZones;";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                try
                 {
-                    while (reader.Read())
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        string timezone = reader.GetString(0);
-                        timezones.Add(timezone);
+                        while (reader.Read())
+                        {
+                            string timezone = reader.GetString(0);
+                            timezones.Add(timezone);
+                        }
                     }
                 }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
+                }
+
             }
             return timezones.ToArray();
         }
@@ -106,18 +169,27 @@ namespace Vispl.Trainee.CricInfo.DL
                 string query = "Select TeamID, TeamName From Teams;";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                try
                 {
-                    while (reader.Read())
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        TeamListVO team = new TeamListVO
+                        while (reader.Read())
                         {
-                            TeamID = reader.GetInt32(0),
-                            TeamName = reader.GetString(1)
-                        };
-                        teamList.Add(team);
+                            TeamListVO team = new TeamListVO
+                            {
+                                TeamID = reader.GetInt32(0),
+                                TeamName = reader.GetString(1)
+                            };
+                            teamList.Add(team);
+                        }
                     }
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
             return teamList;

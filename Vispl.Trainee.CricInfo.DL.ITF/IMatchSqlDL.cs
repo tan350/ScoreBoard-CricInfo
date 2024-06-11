@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 using Vispl.Trainee.CricInfo.VO;
 
 namespace Vispl.Trainee.CricInfo.DL.ITF
@@ -13,5 +14,6 @@ namespace Vispl.Trainee.CricInfo.DL.ITF
         List<MatchVO> ReadAllRecords();
         string[] GetTimezoneList();
         List<TeamListVO> GetTeamList();
+        DataTable GetZones();
     }
 }

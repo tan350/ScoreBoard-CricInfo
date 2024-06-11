@@ -15,62 +15,6 @@ namespace Vispl.Trainee.CricInfo.DL
     public class PlayerSqlDL :IPlayerSqlDL
     {
         private readonly string connectionString = ConnectionStringManager.GetConnectionString();
-        private bool disposed = false;
-        private SqlConnection connection;
-
-
-        private DataTable ReadRecordsInDataTable()
-        {
-            DataTable dataTable = new DataTable();
-            string queryString = "SELECT * FROM Players;";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter(queryString, connection);
-                connection.Open();
-                adapter.Fill(dataTable);
-            }
-
-            return dataTable;
-        }
-
-
-        private List<PlayerVO> ConvertDataTableToPlayerVOList(DataTable dataTable)
-        {
-            var playerList = new List<PlayerVO>();
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var player = new PlayerVO
-                {
-                    Picture = row["Picture"] as byte[],
-                    JerseyNo = Convert.ToInt32(row["JerseyNo"]),
-                    Name = row["Name"].ToString(),
-                    DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
-                    Age = Convert.ToInt32(row["Age"]),
-                    BirthPlace = row["BirthPlace"].ToString(),
-                    PlayerTypeFielder = Convert.ToBoolean(row["PlayerTypeFielder"]),
-                    PlayerTypeBowler = Convert.ToBoolean(row["PlayerTypeBowler"]),
-                    PlayerTypeBatsman = Convert.ToBoolean(row["PlayerTypeBatsman"]),
-                    PlayerTypeAllRounder = Convert.ToBoolean(row["PlayerTypeAllRounder"]),
-                    IsCaptain = Convert.ToBoolean(row["IsCaptain"]),
-                    Nationality = row["Nationality"].ToString(),
-                    Team = row["TeamId"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["TeamId"]),
-                    MatchesPlayed = Convert.ToInt32(row["MatchesPlayed"]),
-                    RunsScored = Convert.ToInt32(row["RunsScored"]),
-                    WicketsTaken = Convert.ToInt32(row["WicketsTaken"]),
-                    BattingAverage = Convert.ToDouble(row["BattingAverage"]),
-                    BowlingAverage = Convert.ToDouble(row["BowlingAverage"]),
-                    Centuries = Convert.ToInt32(row["Centuries"]),
-                    HalfCenturies = Convert.ToInt32(row["HalfCenturies"]),
-                    DebutDate = Convert.ToDateTime(row["DebutDate"]),
-                    ICCRanking = Convert.ToInt32(row["ICCRanking"])
-                };
-                playerList.Add(player);
-            }
-            return playerList;
-        }
-
 
         public List<PlayerVO> ReadAllRecords()
         {
@@ -80,41 +24,49 @@ namespace Vispl.Trainee.CricInfo.DL
             SqlConnection connection = new SqlConnection(connectionString); 
             SqlCommand command = new SqlCommand(queryString, connection);
             SqlDataAdapter adapter = new SqlDataAdapter(command);
-            connection.Open();
-            adapter.Fill(dataTable);
-
             var records = new List<PlayerVO>();
-
-            foreach (DataRow row in dataTable.Rows)
+            try
             {
-                var player = new PlayerVO
+                connection.Open();
+                adapter.Fill(dataTable);
+
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    Picture = row["Picture"] as byte[],
-                    JerseyNo = Convert.ToInt32(row["JerseyNo"]),
-                    Name = row["Name"].ToString(),
-                    DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
-                    Age = Convert.ToInt32(row["Age"]),
-                    BirthPlace = row["BirthPlace"].ToString(),
-                    PlayerTypeFielder = Convert.ToBoolean(row["PlayerTypeFielder"]),
-                    PlayerTypeBowler = Convert.ToBoolean(row["PlayerTypeBowler"]),
-                    PlayerTypeBatsman = Convert.ToBoolean(row["PlayerTypeBatsman"]),
-                    PlayerTypeAllRounder = Convert.ToBoolean(row["PlayerTypeAllRounder"]),
-                    IsCaptain = Convert.ToBoolean(row["IsCaptain"]),
-                    Nationality = row["Nationality"].ToString(),
-                    Team = row["TeamId"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["TeamId"]),
-                    MatchesPlayed = Convert.ToInt32(row["MatchesPlayed"]),
-                    RunsScored = Convert.ToInt32(row["RunsScored"]),
-                    WicketsTaken = Convert.ToInt32(row["WicketsTaken"]),
-                    BattingAverage = Convert.ToDouble(row["BattingAverage"]),
-                    BowlingAverage = Convert.ToDouble(row["BowlingAverage"]),
-                    Centuries = Convert.ToInt32(row["Centuries"]),
-                    HalfCenturies = Convert.ToInt32(row["HalfCenturies"]),
-                    DebutDate = Convert.ToDateTime(row["DebutDate"]),
-                    ICCRanking = Convert.ToInt32(row["ICCRanking"])
-                };
-                records.Add(player);
+                    var player = new PlayerVO
+                    {
+                        Picture = row["Picture"] as byte[],
+                        JerseyNo = Convert.ToInt32(row["JerseyNo"]),
+                        Name = row["Name"].ToString(),
+                        DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
+                        Age = Convert.ToInt32(row["Age"]),
+                        BirthPlace = row["BirthPlace"].ToString(),
+                        PlayerTypeFielder = Convert.ToBoolean(row["PlayerTypeFielder"]),
+                        PlayerTypeBowler = Convert.ToBoolean(row["PlayerTypeBowler"]),
+                        PlayerTypeBatsman = Convert.ToBoolean(row["PlayerTypeBatsman"]),
+                        PlayerTypeAllRounder = Convert.ToBoolean(row["PlayerTypeAllRounder"]),
+                        IsCaptain = Convert.ToBoolean(row["IsCaptain"]),
+                        Nationality = row["Nationality"].ToString(),
+                        Team = row["TeamId"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["TeamId"]),
+                        MatchesPlayed = Convert.ToInt32(row["MatchesPlayed"]),
+                        RunsScored = Convert.ToInt32(row["RunsScored"]),
+                        WicketsTaken = Convert.ToInt32(row["WicketsTaken"]),
+                        BattingAverage = Convert.ToDouble(row["BattingAverage"]),
+                        BowlingAverage = Convert.ToDouble(row["BowlingAverage"]),
+                        Centuries = Convert.ToInt32(row["Centuries"]),
+                        HalfCenturies = Convert.ToInt32(row["HalfCenturies"]),
+                        DebutDate = Convert.ToDateTime(row["DebutDate"]),
+                        ICCRanking = Convert.ToInt32(row["ICCRanking"])
+                    };
+                    records.Add(player);
+                }
             }
-            ReleaseAndDispose(adapter, dataTable, command);
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                ReleaseAndDispose(adapter, dataTable, command);
+            }
+           
             return records;
         }
 
@@ -124,76 +76,93 @@ namespace Vispl.Trainee.CricInfo.DL
             string queryString = @"INSERT INTO Players (JerseyNo, Name, DateOfBirth, Age, BirthPlace, PlayerTypeFielder, PlayerTypeBowler, PlayerTypeBatsman, PlayerTypeAllRounder, IsCaptain, Nationality, TeamId, MatchesPlayed, RunsScored, WicketsTaken, BattingAverage, BowlingAverage, Centuries, HalfCenturies, DebutDate, ICCRanking, Picture)
                            VALUES (@JerseyNo, @Name, @DateOfBirth, @Age, @BirthPlace, @PlayerTypeFielder, @PlayerTypeBowler, @PlayerTypeBatsman, @PlayerTypeAllRounder, @IsCaptain, @Nationality, @TeamId, @MatchesPlayed, @RunsScored, @WicketsTaken, @BattingAverage, @BowlingAverage, @Centuries, @HalfCenturies, @DebutDate, @ICCRanking, @Picture);";
 
-            using (connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand command = new SqlCommand(queryString, connection);
+                try
+                {
+                    command.Parameters.AddWithValue("@JerseyNo", record.JerseyNo);
+                    command.Parameters.AddWithValue("@Name", record.Name);
+                    if (record.DateOfBirth == null || record.DateOfBirth == DateTime.MinValue)
+                    {
+                        command.Parameters.AddWithValue("@DateOfBirth", new DateTime(1900, 1, 1));
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@DateOfBirth", record.DateOfBirth);
+                    }
+                    command.Parameters.AddWithValue("@Age", record.Age);
+                    command.Parameters.AddWithValue("@BirthPlace", record.BirthPlace);
+                    command.Parameters.AddWithValue("@PlayerTypeFielder", record.PlayerTypeFielder);
+                    command.Parameters.AddWithValue("@PlayerTypeBowler", record.PlayerTypeBowler);
+                    command.Parameters.AddWithValue("@PlayerTypeBatsman", record.PlayerTypeBatsman);
+                    command.Parameters.AddWithValue("@PlayerTypeAllRounder", record.PlayerTypeAllRounder);
+                    command.Parameters.AddWithValue("@IsCaptain", record.IsCaptain);
+                    command.Parameters.AddWithValue("@Nationality", record.Nationality);
+                    if (record.Team == null)
+                    {
+                        command.Parameters.AddWithValue("@TeamId", DBNull.Value);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@TeamId", record.Team);
+                    }
 
-                command.Parameters.AddWithValue("@JerseyNo", record.JerseyNo);
-                command.Parameters.AddWithValue("@Name", record.Name);
-                if (record.DateOfBirth == null || record.DateOfBirth == DateTime.MinValue)
-                {
-                    command.Parameters.AddWithValue("@DateOfBirth", new DateTime(1900, 1, 1));
-                }
-                else
-                {
-                    command.Parameters.AddWithValue("@DateOfBirth", record.DateOfBirth);
-                }
-                command.Parameters.AddWithValue("@Age", record.Age);
-                command.Parameters.AddWithValue("@BirthPlace", record.BirthPlace);
-                command.Parameters.AddWithValue("@PlayerTypeFielder", record.PlayerTypeFielder);
-                command.Parameters.AddWithValue("@PlayerTypeBowler", record.PlayerTypeBowler);
-                command.Parameters.AddWithValue("@PlayerTypeBatsman", record.PlayerTypeBatsman);
-                command.Parameters.AddWithValue("@PlayerTypeAllRounder", record.PlayerTypeAllRounder);
-                command.Parameters.AddWithValue("@IsCaptain", record.IsCaptain);
-                command.Parameters.AddWithValue("@Nationality", record.Nationality);
-                if (record.Team == null)
-                {
-                    command.Parameters.AddWithValue("@TeamId",DBNull.Value);
-                }
-                else
-                {
-                    command.Parameters.AddWithValue("@TeamId", record.Team);
-                }
-           
-                command.Parameters.AddWithValue("@MatchesPlayed", record.MatchesPlayed);
-                command.Parameters.AddWithValue("@RunsScored", record.RunsScored);
-                command.Parameters.AddWithValue("@WicketsTaken", record.WicketsTaken);
-                command.Parameters.AddWithValue("@BattingAverage", record.BattingAverage);
-                command.Parameters.AddWithValue("@BowlingAverage", record.BowlingAverage);
-                command.Parameters.AddWithValue("@Centuries", record.Centuries);
-                command.Parameters.AddWithValue("@HalfCenturies", record.HalfCenturies);
-                if (record.DebutDate == null || record.DebutDate == DateTime.MinValue)
-                {
-                    command.Parameters.AddWithValue("@DebutDate", new DateTime(1900, 1, 1));
-                }
-                else
-                {
-                    command.Parameters.AddWithValue("@DebutDate", record.DebutDate);
-                }
-                command.Parameters.AddWithValue("@ICCRanking", record.ICCRanking);
-                command.Parameters.AddWithValue("@Picture", record.Picture ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@MatchesPlayed", record.MatchesPlayed);
+                    command.Parameters.AddWithValue("@RunsScored", record.RunsScored);
+                    command.Parameters.AddWithValue("@WicketsTaken", record.WicketsTaken);
+                    command.Parameters.AddWithValue("@BattingAverage", record.BattingAverage);
+                    command.Parameters.AddWithValue("@BowlingAverage", record.BowlingAverage);
+                    command.Parameters.AddWithValue("@Centuries", record.Centuries);
+                    command.Parameters.AddWithValue("@HalfCenturies", record.HalfCenturies);
+                    if (record.DebutDate == null || record.DebutDate == DateTime.MinValue)
+                    {
+                        command.Parameters.AddWithValue("@DebutDate", new DateTime(1900, 1, 1));
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@DebutDate", record.DebutDate);
+                    }
+                    command.Parameters.AddWithValue("@ICCRanking", record.ICCRanking);
+                    command.Parameters.AddWithValue("@Picture", record.Picture ?? (object)DBNull.Value);
 
-                connection.Open();
-                command.ExecuteNonQuery();
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+
+
             }
         }
 
         public string[] GetNationalityList()
         {
             List<string> nationalityList = new List<string>();
-            using (connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string query = "Select NationalityName From Nationality;";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                try
                 {
-                    while (reader.Read())
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        string nationality = reader.GetString(0);
-                        nationalityList.Add(nationality);
+                        while (reader.Read())
+                        {
+                            string nationality = reader.GetString(0);
+                            nationalityList.Add(nationality);
+                        }
                     }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
             return nationalityList.ToArray();
@@ -203,23 +172,32 @@ namespace Vispl.Trainee.CricInfo.DL
         public List<PlayerListVO> GetPlayersNameList()
         {
             List<PlayerListVO> playerList = new List<PlayerListVO>();
-            using (connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string query = "Select PlayerId, Name From Players;";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+
+                try
                 {
-                    while (reader.Read())
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        PlayerListVO player = new PlayerListVO
+                        while (reader.Read())
                         {
-                            PlayerId = reader.GetInt32(0),
-                            Name = reader.GetString(1)
-                        };
-                        playerList.Add(player);
+                            PlayerListVO player = new PlayerListVO
+                            {
+                                PlayerId = reader.GetInt32(0),
+                                Name = reader.GetString(1)
+                            };
+                            playerList.Add(player);
+                        }
                     }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
             return playerList;
@@ -228,23 +206,31 @@ namespace Vispl.Trainee.CricInfo.DL
         public List<PlayerListVO> GetCaptainNameList()
         {
             List<PlayerListVO> captainList = new List<PlayerListVO>();
-            using (connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string query = "Select PlayerId, Name From Players where IsCaptain = 1;";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                try
                 {
-                    while (reader.Read())
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        PlayerListVO captain = new PlayerListVO
+                        while (reader.Read())
                         {
-                            PlayerId = reader.GetInt32(0),
-                            Name = reader.GetString(1)
-                        };
-                        captainList.Add(captain);
+                            PlayerListVO captain = new PlayerListVO
+                            {
+                                PlayerId = reader.GetInt32(0),
+                                Name = reader.GetString(1)
+                            };
+                            captainList.Add(captain);
+                        }
                     }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
                 }
             }
             return captainList;
