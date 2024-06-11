@@ -29,7 +29,7 @@
     <div class="form-group">
         <label>Captain:</label>
         <div>
-            @Html.EJS().DropDownList("Captain").Change("captainChange").Placeholder("Select Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.CaptainNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.EJS().DropDownList("Captain").Change("captainChange").Placeholder("Select Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.CaptainNames).Fields(f => f.Value("Value").Text("Value")).Render()
             @Html.ValidationMessageFor(model => model.Captain,"", new { @class = "text-danger" })
         </div>
     </div>
@@ -37,7 +37,7 @@
     <div class="form-group">
         <label>Vice Captain:</label>
         <div>
-            @Html.EJS().DropDownList("ViceCaptain").Placeholder("Select Vice Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.EJS().DropDownList("ViceCaptain").Placeholder("Select Vice Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Value").Text("Value")).Render()
             
         </div>
     </div>
@@ -45,7 +45,7 @@
     <div class="form-group">
         <label>Wicket Keeper:</label>
         <div>
-            @Html.EJS().DropDownList("WicketKeeper").Placeholder("Select WicketKeeper").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.EJS().DropDownList("WicketKeeper").Placeholder("Select WicketKeeper").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Value").Text("Value")).Render()
             @Html.ValidationMessageFor(model => model.WicketKeeper, "", new { @class = "text-danger" })
         </div>
     </div>

@@ -9,6 +9,7 @@ using Vispl.Trainee.CricInfo.VO;
 using Vispl.Trainee.CricInfo.DL.ITF;
 using static Vispl.Trainee.CricInfo.RES.PlayerRES;
 using System.Data;
+using System.Windows.Input;
 
 namespace Vispl.Trainee.CricInfo.DL
 {
@@ -40,11 +41,8 @@ namespace Vispl.Trainee.CricInfo.DL
                         DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
                         Age = Convert.ToInt32(row["Age"]),
                         BirthPlace = row["BirthPlace"].ToString(),
-                        PlayerTypeFielder = Convert.ToBoolean(row["PlayerTypeFielder"]),
-                        PlayerTypeBowler = Convert.ToBoolean(row["PlayerTypeBowler"]),
-                        PlayerTypeBatsman = Convert.ToBoolean(row["PlayerTypeBatsman"]),
-                        PlayerTypeAllRounder = Convert.ToBoolean(row["PlayerTypeAllRounder"]),
-                        IsCaptain = Convert.ToBoolean(row["IsCaptain"]),
+                        PlayerType = row["PlayerType"].ToString(),
+                        IsCaptain = row["IsCaptain"].ToString(),
                         Nationality = row["Nationality"].ToString(),
                         Team = row["TeamId"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["TeamId"]),
                         MatchesPlayed = Convert.ToInt32(row["MatchesPlayed"]),
@@ -73,8 +71,8 @@ namespace Vispl.Trainee.CricInfo.DL
 
         public void AddRecord(PlayerVO record)
         {
-            string queryString = @"INSERT INTO Players (JerseyNo, Name, DateOfBirth, Age, BirthPlace, PlayerTypeFielder, PlayerTypeBowler, PlayerTypeBatsman, PlayerTypeAllRounder, IsCaptain, Nationality, TeamId, MatchesPlayed, RunsScored, WicketsTaken, BattingAverage, BowlingAverage, Centuries, HalfCenturies, DebutDate, ICCRanking, Picture)
-                           VALUES (@JerseyNo, @Name, @DateOfBirth, @Age, @BirthPlace, @PlayerTypeFielder, @PlayerTypeBowler, @PlayerTypeBatsman, @PlayerTypeAllRounder, @IsCaptain, @Nationality, @TeamId, @MatchesPlayed, @RunsScored, @WicketsTaken, @BattingAverage, @BowlingAverage, @Centuries, @HalfCenturies, @DebutDate, @ICCRanking, @Picture);";
+            string queryString = @"INSERT INTO Players (JerseyNo, Name, DateOfBirth, Age, BirthPlace, PlayerType, IsCaptain, Nationality, TeamId, MatchesPlayed, RunsScored, WicketsTaken, BattingAverage, BowlingAverage, Centuries, HalfCenturies, DebutDate, ICCRanking, Picture)
+                           VALUES (@JerseyNo, @Name, @DateOfBirth, @Age, @BirthPlace, @PlayerType, @IsCaptain, @Nationality, @TeamId, @MatchesPlayed, @RunsScored, @WicketsTaken, @BattingAverage, @BowlingAverage, @Centuries, @HalfCenturies, @DebutDate, @ICCRanking, @Picture);";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -93,10 +91,7 @@ namespace Vispl.Trainee.CricInfo.DL
                     }
                     command.Parameters.AddWithValue("@Age", record.Age);
                     command.Parameters.AddWithValue("@BirthPlace", record.BirthPlace);
-                    command.Parameters.AddWithValue("@PlayerTypeFielder", record.PlayerTypeFielder);
-                    command.Parameters.AddWithValue("@PlayerTypeBowler", record.PlayerTypeBowler);
-                    command.Parameters.AddWithValue("@PlayerTypeBatsman", record.PlayerTypeBatsman);
-                    command.Parameters.AddWithValue("@PlayerTypeAllRounder", record.PlayerTypeAllRounder);
+                    command.Parameters.AddWithValue("@PlayerType", record.PlayerType);
                     command.Parameters.AddWithValue("@IsCaptain", record.IsCaptain);
                     command.Parameters.AddWithValue("@Nationality", record.Nationality);
                     if (record.Team == null)
@@ -124,8 +119,9 @@ namespace Vispl.Trainee.CricInfo.DL
                         command.Parameters.AddWithValue("@DebutDate", record.DebutDate);
                     }
                     command.Parameters.AddWithValue("@ICCRanking", record.ICCRanking);
-                    command.Parameters.AddWithValue("@Picture", record.Picture ?? (object)DBNull.Value);
-
+                    SqlParameter pictureParameter = new SqlParameter("@Picture", SqlDbType.VarBinary, -1);
+                    pictureParameter.Value = record.Picture ?? (object)DBNull.Value;
+                    command.Parameters.Add(pictureParameter);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -174,7 +170,7 @@ namespace Vispl.Trainee.CricInfo.DL
             List<PlayerListVO> playerList = new List<PlayerListVO>();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "Select PlayerId, Name From Players;";
+                string query = "Select PlayerId, Name From Players where TeamId Is Null;";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -208,7 +204,7 @@ namespace Vispl.Trainee.CricInfo.DL
             List<PlayerListVO> captainList = new List<PlayerListVO>();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "Select PlayerId, Name From Players where IsCaptain = 1;";
+                string query = "Select PlayerId, Name From Players where IsCaptain = 'Yes';";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 try

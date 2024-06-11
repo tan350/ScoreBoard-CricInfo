@@ -56,6 +56,8 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    string playersSelected = Request.Form["PlayerType"];
+                    player.PlayerType = playersSelected;
                     if (Image != null)
                     {
                         foreach (var file in Image)

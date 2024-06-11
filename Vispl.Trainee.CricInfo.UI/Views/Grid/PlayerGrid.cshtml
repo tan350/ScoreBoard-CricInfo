@@ -16,13 +16,10 @@
             col.Field(p => p.Picture).HeaderText("Picture").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${Picture}\" class=\"pic\" />").Width("150").Add();
             col.Field(p => p.JerseyNo).HeaderText("Jersey No").Width("120").Add();
             col.Field(p => p.Name).HeaderText("Name").Width("200").Add();
-            col.Field(p => p.DateOfBirth).HeaderText("Date Of Birth").Width("160").Add();
+            col.Field(p => p.DateOfBirth).HeaderText("Date Of Birth").Format("dd-MM-yyyy").Width("160").Add();
             col.Field(p => p.Age).HeaderText("Age").Width("100").Add();
             col.Field(p => p.BirthPlace).HeaderText("Birth Place").Width("150").Add();
-            col.Field(p => p.PlayerTypeFielder).HeaderText("Fielder").Width("250").Add();
-            col.Field(p => p.PlayerTypeBowler).HeaderText("Bowler").Width("250").Add();
-            col.Field(p => p.PlayerTypeBatsman).HeaderText("Batsman").Width("250").Add();
-            col.Field(p => p.PlayerTypeAllRounder).HeaderText("All Rounder").Width("250").Add();
+            col.Field(p => p.PlayerType).HeaderText("Player Type").Width("250").Add();
             col.Field(p => p.IsCaptain).HeaderText("Captain").Width("120").Add();
             col.Field(p => p.Nationality).HeaderText("Nationality").Width("150").Add();
             col.Field(p => p.Team).HeaderText("Team").Width("150").Add();
@@ -33,7 +30,7 @@
             col.Field(p => p.BowlingAverage).HeaderText("Bowling Average").Width("250").Add();
             col.Field(p => p.Centuries).HeaderText("Centuries").Width("200").Add();
             col.Field(p => p.HalfCenturies).HeaderText("Half Centuries").Width("150").Add();
-            col.Field(p => p.DebutDate).HeaderText("Debut Date").Width("150").Add();
+            col.Field(p => p.DebutDate).HeaderText("Debut Date").Format("dd-MM-yyyy").Width("150").Add();
             col.Field(p => p.ICCRanking).HeaderText("ICC Ranking").Width("150").Add();
 
         })

@@ -8,32 +8,18 @@
 
 @using Syncfusion.EJ2.Grids
 
-@{
-    var SecondChildGrid = new Syncfusion.EJ2.Grids.Grid()
-    {
-        DataSource = (IEnumerable<object>)ViewBag.CustomerDataSource,
-        QueryString = "CustomerID",
-        Columns = new List<Syncfusion.EJ2.Grids.GridColumn> {
-                new Syncfusion.EJ2.Grids.GridColumn(){ Field="CustomerID", HeaderText="Customer ID", Width="90", TextAlign=Syncfusion.EJ2.Grids.TextAlign.Right },
-                new Syncfusion.EJ2.Grids.GridColumn(){ Field="ContactName", HeaderText="Name", Width="100" },
-                new Syncfusion.EJ2.Grids.GridColumn(){ Field="CompanyName", HeaderText="Company", Width="120" },
-                new Syncfusion.EJ2.Grids.GridColumn(){ Field="Country", HeaderText="Country", Width="90" },
-        }
-    };
-}
-
     <div id="TeamGridContainer">
         @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.TeamVO>("TeamGrid").DataSource(Model).Columns(col =>
-{
-    col.Field(p => p.TeamIcon).HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").Add();
-    col.Field(p => p.TeamName).HeaderText("Team Name").Width("120").Add();
-    col.Field(p => p.TeamShortName).HeaderText("Team Short Name").Width("200").Add();
-    col.Field(p => p.TeamMembers).HeaderText("Team Members").Width("220").Add();
-    col.Field(p => p.Captain).HeaderText("Captain").Width("120").Add();
-    col.Field(p => p.ViceCaptain).HeaderText("Vice Captain").Width("120").Add();
-    col.Field(p => p.WicketKeeper).HeaderText("WicketKeeper").Width("120").Add();
+    {
+        col.Field(p => p.TeamIcon).HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").Add();
+        col.Field(p => p.TeamName).HeaderText("Team Name").Width("200").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();
+        col.Field(p => p.TeamShortName).HeaderText("Team Short Name").Width("200").Add();
+        col.Field(p => p.TeamMembers).HeaderText("Team Members").Width("350").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();
+        col.Field(p => p.Captain).HeaderText("Captain").Width("220").Add();
+        col.Field(p => p.ViceCaptain).HeaderText("Vice Captain").Width("220").Add();
+        col.Field(p => p.WicketKeeper).HeaderText("WicketKeeper").Width("220").Add();
 
-})
+    })
     .AllowPaging(true)
     .AllowSorting(true)
     .AllowGrouping(true)

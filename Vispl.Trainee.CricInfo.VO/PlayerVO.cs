@@ -15,11 +15,8 @@ namespace Vispl.Trainee.CricInfo.VO
         public DateTime DateOfBirth { get; set; }
         public int Age { get; set; }
         public string BirthPlace { get; set; }
-        public bool PlayerTypeFielder { get; set; }
-        public bool PlayerTypeBowler { get; set; }
-        public bool PlayerTypeBatsman { get; set; }
-        public bool PlayerTypeAllRounder { get; set; }
-        public bool IsCaptain { get; set; }
+        public string PlayerType { get; set; }
+        public string IsCaptain { get; set; }
         public string Nationality { get; set; }
         public int? Team { get; set; }
         public int MatchesPlayed { get; set; }

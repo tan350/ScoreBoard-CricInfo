@@ -24,13 +24,13 @@
 
             <div class="form-group">
                 <label>Date Of Birth:</label>
-                @Html.EJS().DateTimePicker("DateOfBirth").Change("onDOBChange").Value(Model.DateOfBirth).Render()
+                @Html.EJS().DateTimePicker("DateOfBirth").Change("onDOBChange").Value(Model.DateOfBirth).Format("yyyy-MM-dd").Render()
 
             </div>
 
             <div class="form-group">
                 <label>Age:</label>
-                @Html.EJS().NumericTextBox("Age").Placeholder("Age").Format("###").Min(13).Value(Model.Age).Enabled(false).Render()
+                @Html.EJS().NumericTextBox("Age").Placeholder("Age").Format("###").Value(Model.Age).Enabled(false).Render()
 
             </div>
 
@@ -43,21 +43,18 @@
             <div class="form-group">
                 <label>Player Type:</label>
                 <div>
-                    @Html.EJS().CheckBox("PlayerTypeFielder").Label("Fielder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeFielder").Checked(@Model.PlayerTypeFielder).Change("onFielderChange").Render()
-
-                    @Html.EJS().CheckBox("PlayerTypeBowler").Label("Bowler").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeBowler").Checked(@Model.PlayerTypeBowler).Change("onBowlerChange").Render()
-
-                    @Html.EJS().CheckBox("PlayerTypeBatsman").Label("Batsman").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeBatsman").Checked(@Model.PlayerTypeBatsman).Change("onBatsmanChange").Render()
-
-                    @Html.EJS().CheckBox("PlayerTypeAllRounder").Label("AllRounder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerTypeAllRounder").Checked(@Model.PlayerTypeAllRounder).Change("handleAllrounderChange").Render()
+                    @Html.EJS().CheckBox("PlayerTypeFielder").Label("Fielder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("Fielder").Render()
+                    @Html.EJS().CheckBox("PlayerTypeBowler").Label("Bowler").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("Bowler").Render()
+                    @Html.EJS().CheckBox("PlayerTypeBatsman").Label("Batsman").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("Batsman").Render()
+                    @Html.EJS().CheckBox("PlayerTypeAllRounder").Label("AllRounder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("AllRounder").Change("handleAllrounderChange").Render()
                 </div>
             </div>
 
 
             <div class="form-group">
                 <label>Is Captain:</label>
-                @Html.EJS().RadioButton("IsCaptainYes").Label("Yes").Name("IsCaptain").Value((!Model.IsCaptain).ToString()).Checked(!Model.IsCaptain).Render()
-                @Html.EJS().RadioButton("IsCaptainNo").Label("No").Name("IsCaptain").Value(Model.IsCaptain.ToString()).Checked(Model.IsCaptain).Render()
+                @Html.EJS().RadioButton("IsCaptainYes").Label("Yes").Name("IsCaptain").Value("Yes").Render()
+                @Html.EJS().RadioButton("IsCaptainNo").Label("No").Name("IsCaptain").Value("No").Render()
             </div>
 
             <div class="form-group">
@@ -75,7 +72,7 @@
 
             <div class="form-group">
                 <label>Matches Played:</label>
-                @Html.EJS().NumericTextBox("MatchesPlayed").Min(0).Value(Model.MatchesPlayed).Render()
+                @Html.EJS().NumericTextBox("MatchesPlayed").Format("###").Min(0).Value(Model.MatchesPlayed).Render()
             </div>
         </div>
 
@@ -84,42 +81,42 @@
 
             <div class="form-group">
                 <label>Runs Scored:</label>
-                @Html.EJS().NumericTextBox("RunsScored").Min(0).Value(Model.RunsScored).Render()
+                @Html.EJS().NumericTextBox("RunsScored").Format("####").Min(0).Value(Model.RunsScored).Render()
             </div>
 
             <div class="form-group">
                 <label>Wickets Taken:</label>
-                @Html.EJS().NumericTextBox("WicketsTaken").Min(0).Value(Model.WicketsTaken).Render()
+                @Html.EJS().NumericTextBox("WicketsTaken").Format("###").Min(0).Value(Model.WicketsTaken).Render()
             </div>
 
             <div class="form-group">
                 <label>Batting Average:</label>
-                @Html.EJS().NumericTextBox("BattingAverage").Min(0).Value(Model.BattingAverage).Render()
+                @Html.EJS().NumericTextBox("BattingAverage").Format("###").Min(0).Value(Model.BattingAverage).Render()
             </div>
 
             <div class="form-group">
                 <label>Bowling Average:</label>
-                @Html.EJS().NumericTextBox("BowlingAverage").Min(0).Value(Model.BowlingAverage).Render()
+                @Html.EJS().NumericTextBox("BowlingAverage").Format("###").Min(0).Value(Model.BowlingAverage).Render()
             </div>
 
             <div class="form-group">
                 <label>Centuries:</label>
-                @Html.EJS().NumericTextBox("Centuries").Min(0).Value(Model.Centuries).Render()
+                @Html.EJS().NumericTextBox("Centuries").Format("###").Min(0).Value(Model.Centuries).Render()
             </div>
 
             <div class="form-group">
                 <label>Half Centuries:</label>
-                @Html.EJS().NumericTextBox("HalfCenturies").Min(0).Value(Model.HalfCenturies).Render()
+                @Html.EJS().NumericTextBox("HalfCenturies").Format("###").Min(0).Value(Model.HalfCenturies).Render()
             </div>
 
             <div class="form-group">
                 <label>Debut Date:</label>
-                @Html.EJS().DateTimePicker("DebutDate").Value(Model.DebutDate).Render()
+                @Html.EJS().DateTimePicker("DebutDate").Value(Model.DebutDate).Format("yyyy-MM-dd").Render()
             </div>
 
             <div class="form-group">
                 <label>ICC Ranking:</label>
-                @Html.EJS().NumericTextBox("ICCRanking").Min(0).Value(Model.ICCRanking).Render()
+                @Html.EJS().NumericTextBox("ICCRanking").Format("###").Min(0).Value(Model.ICCRanking).Render()
             </div>
 
             <div class="form-group">
@@ -146,36 +143,71 @@
         const jerseyNo = document.querySelector('#JerseyNo').ej2_instances[0].value;
         const name = document.querySelector('#Name').ej2_instances[0].value;
         const dateOfBirth = document.querySelector('#DateOfBirth').ej2_instances[0].value;
+        const age = document.getElementById('Age').ej2_instances[0].value;
         const birthPlace = document.querySelector('#BirthPlace').ej2_instances[0].value;
         const nationality = document.querySelector('#Nationality').ej2_instances[0].value;
         const imageUploader = document.querySelector('#Image').ej2_instances[0];
         const files = imageUploader.getFilesData();
 
+        const playerTypeChecked = document.querySelectorAll('input[name="PlayerType"]:checked').length > 0;
+        const isCaptainChecked = document.querySelectorAll('input[name="IsCaptain"]:checked').length > 0;
+
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+        const maxFileSize = 1 * 1024 * 1024; // 1 MB in bytes
+
         if (!jerseyNo) {
             errorMessages.push("Please enter the Jersey No.");
             isValid = false;
         }
-        else if (!name) {
+
+        if (!name) {
             errorMessages.push("Please enter the Name.");
             isValid = false;
         }
-        else if (!dateOfBirth) {
+
+        if (!dateOfBirth) {
             errorMessages.push("Please select the Date of Birth.");
             isValid = false;
         }
-        else if (!birthPlace) {
+
+        if (age < 13) {
+            errorMessages.push("Please select the DOB, Age should not be less than 13.");
+            isValid = false;
+        }
+
+        if (!birthPlace) {
             errorMessages.push("Please enter the BirthPlace.");
             isValid = false;
         }
-        else if (!nationality) {
+
+        if (!playerTypeChecked) {
+            errorMessages.push("Please select at least one player type.");
+            isValid = false;
+        }
+
+        if (!isCaptainChecked) {
+            errorMessages.push("Please select if the player is a captain.");
+            isValid = false;
+        }
+
+        if (!nationality) {
             errorMessages.push("Please select a Nationality.");
             isValid = false;
         }
-        else if (files.length > 0) {
-            const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-            const fileExtension = files[0].type.split('/').pop().toLowerCase();
-            if (!allowedExtensions.includes('.' + fileExtension)) {
+
+        if (files.length > 0) {
+            const file = files[0];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+
+            if (!allowedExtensions.includes(fileExtension)) {
                 errorMessages.push("Invalid file type for image. Allowed: .jpg, .jpeg, .png, .gif");
+                imageUploader.clear();
+                isValid = false;
+            }
+
+            if (file.size > maxFileSize) {
+                errorMessages.push("File size must be less than 1 MB.");
+                imageUploader.clear();
                 isValid = false;
             }
         }
@@ -188,51 +220,21 @@
 
 
     function handleAllrounderChange(args) {
-        if (args.checked) {
+        if (args.checked)
+        {
             document.getElementById("PlayerTypeFielder").ej2_instances[0].checked = false;
             document.getElementById("PlayerTypeBowler").ej2_instances[0].checked = false;
             document.getElementById("PlayerTypeBatsman").ej2_instances[0].checked = false;
-            document.getElementById("PlayerTypeAllRounder").ej2_instances[0].value = true;
 
             document.getElementById("PlayerTypeFielder").ej2_instances[0].disabled = true;
             document.getElementById("PlayerTypeBowler").ej2_instances[0].disabled = true;
             document.getElementById("PlayerTypeBatsman").ej2_instances[0].disabled = true;
-        } else {
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].checked = true;
-            document.getElementById("PlayerTypeBowler").ej2_instances[0].checked = true;
-            document.getElementById("PlayerTypeBatsman").ej2_instances[0].checked = true;
-
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].value = true;
-            document.getElementById("PlayerTypeBowler").ej2_instances[0].value = true;
-            document.getElementById("PlayerTypeBatsman").ej2_instances[0].value = true;
-
+        }
+        else
+        {
             document.getElementById("PlayerTypeFielder").ej2_instances[0].disabled = false;
             document.getElementById("PlayerTypeBowler").ej2_instances[0].disabled = false;
             document.getElementById("PlayerTypeBatsman").ej2_instances[0].disabled = false;
-        }
-    }
-
-    function onBatsmanChange(args) {
-        if (args.checked) {
-            document.getElementById("PlayerTypeBatsman").ej2_instances[0].value = true;
-        }else{
-            document.getElementById("PlayerTypeBatsman").ej2_instances[0].value = false;
-        }
-    }
-
-    function onFielderChange(args) {
-        if (!args.checked) {
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].value = false;
-        } else {
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].value = true;
-        }
-    }
-
-    function onBowlerChange(args) {
-        if (args.checked) {
-            document.getElementById("PlayerTypeBowler").ej2_instances[0].value = true;
-        } else {
-            document.getElementById("PlayerTypeBowler").ej2_instances[0].value = false;
         }
     }
 
@@ -254,6 +256,7 @@
     }
 
 </script>
+
 
 
 
