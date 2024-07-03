@@ -41,9 +41,9 @@ namespace Vispl.Trainee.CricInfo.DL
                         DateOfBirth = Convert.ToDateTime(row["DateOfBirth"]),
                         Age = Convert.ToInt32(row["Age"]),
                         BirthPlace = row["BirthPlace"].ToString(),
-                        PlayerType = row["PlayerType"].ToString(),
-                        IsCaptain = row["IsCaptain"].ToString(),
-                        Nationality = row["Nationality"].ToString(),
+                        PlayerType = row["PlayerType"] != DBNull.Value ? (int?)Convert.ToInt32(row["PlayerType"]) : null,
+                        Role = row["Role"] != DBNull.Value ? (int?)Convert.ToInt32(row["Role"]) : null,
+                        Nationality = row["Nationality"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["Nationality"]),
                         Team = row["TeamId"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["TeamId"]),
                         MatchesPlayed = Convert.ToInt32(row["MatchesPlayed"]),
                         RunsScored = Convert.ToInt32(row["RunsScored"]),
@@ -68,11 +68,34 @@ namespace Vispl.Trainee.CricInfo.DL
             return records;
         }
 
+        public DataTable ReadAllRecordsDataTable()
+        {
+            DataTable dataTable = new DataTable();
+
+            SqlConnection connection = new SqlConnection(connectionString);
+            string query = "SELECT * FROM PlayerDetails";
+            SqlCommand command = new SqlCommand(query, connection);
+            SqlDataAdapter adapter = new SqlDataAdapter(command);
+
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataTable);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+                ReleaseAndDispose(adapter, dataTable, command);
+            }
+            return dataTable;
+        }
+
 
         public void AddRecord(PlayerVO record)
         {
-            string queryString = @"INSERT INTO Players (JerseyNo, Name, DateOfBirth, Age, BirthPlace, PlayerType, IsCaptain, Nationality, TeamId, MatchesPlayed, RunsScored, WicketsTaken, BattingAverage, BowlingAverage, Centuries, HalfCenturies, DebutDate, ICCRanking, Picture)
-                           VALUES (@JerseyNo, @Name, @DateOfBirth, @Age, @BirthPlace, @PlayerType, @IsCaptain, @Nationality, @TeamId, @MatchesPlayed, @RunsScored, @WicketsTaken, @BattingAverage, @BowlingAverage, @Centuries, @HalfCenturies, @DebutDate, @ICCRanking, @Picture);";
+            string queryString = @"INSERT INTO Players (JerseyNo, Name, DateOfBirth, Age, BirthPlace, PlayerType, Role, Nationality, TeamId, MatchesPlayed, RunsScored, WicketsTaken, BattingAverage, BowlingAverage, Centuries, HalfCenturies, DebutDate, ICCRanking, Picture)
+                           VALUES (@JerseyNo, @Name, @DateOfBirth, @Age, @BirthPlace, @PlayerType, @Role, @Nationality, @TeamId, @MatchesPlayed, @RunsScored, @WicketsTaken, @BattingAverage, @BowlingAverage, @Centuries, @HalfCenturies, @DebutDate, @ICCRanking, @Picture);";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -92,8 +115,22 @@ namespace Vispl.Trainee.CricInfo.DL
                     command.Parameters.AddWithValue("@Age", record.Age);
                     command.Parameters.AddWithValue("@BirthPlace", record.BirthPlace);
                     command.Parameters.AddWithValue("@PlayerType", record.PlayerType);
-                    command.Parameters.AddWithValue("@IsCaptain", record.IsCaptain);
-                    command.Parameters.AddWithValue("@Nationality", record.Nationality);
+                    if (record.Role == null)
+                    {
+                        command.Parameters.AddWithValue("@Role", DBNull.Value);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@Role", record.Role);
+                    }
+                    if (record.Nationality == null)
+                    {
+                        command.Parameters.AddWithValue("@Nationality", DBNull.Value);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@Nationality", record.Nationality);
+                    }
                     if (record.Team == null)
                     {
                         command.Parameters.AddWithValue("@TeamId", DBNull.Value);
@@ -134,6 +171,40 @@ namespace Vispl.Trainee.CricInfo.DL
 
             }
         }
+
+        public List<Dictionary<string, object>> GetNationalityWithID()
+        {
+            List<Dictionary<string, object>> nationalityList = new List<Dictionary<string, object>>();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string query = "SELECT NationalityID, NationalityName FROM Nationality;";
+
+                SqlCommand command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var nationality = new Dictionary<string, object>
+                    {
+                        { "NationalityID", reader.GetInt32(0) },
+                        { "NationalityName", reader.GetString(1) }
+                    };
+                            nationalityList.Add(nationality);
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            return nationalityList;
+        }
+
 
         public string[] GetNationalityList()
         {
@@ -204,7 +275,7 @@ namespace Vispl.Trainee.CricInfo.DL
             List<PlayerListVO> captainList = new List<PlayerListVO>();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "Select PlayerId, Name From Players where IsCaptain = 'Yes';";
+                string query = "Select PlayerId, Name From Players where IsCaptain = 'Yes' AND TeamId Is Null;";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 try
@@ -230,6 +301,74 @@ namespace Vispl.Trainee.CricInfo.DL
                 }
             }
             return captainList;
+        }
+
+        public List<PlayerListVO> GetPlayersNameWithTeamID()
+        {
+            List<PlayerListVO> playerList = new List<PlayerListVO>();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string query = "Select TeamID, Name From Players Where TeamID Is NOT NULL;";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                try
+                {
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            PlayerListVO player = new PlayerListVO
+                            {
+                                PlayerId = reader.GetInt32(0), //TeamID stored in PlayerID
+                                Name = reader.GetString(1)
+                            };
+                            playerList.Add(player);
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            return playerList;
+        }
+
+        public List<PlayerListVO> GetRoleNameWithRoleID()
+        {
+            List<PlayerListVO> playerList = new List<PlayerListVO>();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string query = "Select * From Role;";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                try
+                {
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            PlayerListVO role = new PlayerListVO
+                            {
+                                PlayerId = reader.GetInt32(0), //RoleID stored in PlayerID
+                                Name = reader.GetString(1)     //RoleName stored in Name
+                            };
+                            playerList.Add(role);
+                        }
+                    }
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            return playerList;
         }
 
         private void ReleaseAndDispose(SqlDataAdapter adapter, DataTable dataTable, SqlCommand command = null)

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "target": "es5",
+    //"module": "amd",
+    "module": "es2015",
+    "sourceMap": true,
+    "outDir": "Scripts/dist",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "Scripts/cricketHubClient.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ]
+}
+

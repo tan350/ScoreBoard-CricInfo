@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Vispl.Trainee.CricInfo.BM;
 using Vispl.Trainee.CricInfo.BM.ITF;
+using Vispl.Trainee.CricInfo.VO;
 
 namespace Vispl.Trainee.CricInfo.UI.Controllers
 {
@@ -58,7 +59,14 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
                 ViewBag.playerCount = ValidationBLObject.ReadAllRecordsData().ToList().Count();
                 ViewBag.teamCount = TeamValidationBLObject.ReadAllRecordsData().ToList().Count();
                 ViewBag.matchesCount = MatchValidationBLObject.ReadAllRecordsData().ToList().Count();
-                return View();
+
+                DateTime now = DateTime.Now;
+                DateTime startOfToday = now.Date;
+                DateTime endOfToday = startOfToday.AddDays(1).AddSeconds(-1);
+                /*List<MatchVO> TodayMatch = MatchValidationBLObject.GetTodayMatch(startOfToday, endOfToday);*/
+                List<Dictionary<string, object>> TodayMatch = MatchValidationBLObject.GetMatchesByDateRange(startOfToday, endOfToday);
+
+                return View(TodayMatch);
             }
             finally
             {

@@ -17,17 +17,15 @@ namespace Vispl.Trainee.CricInfo.VO
         [Required(ErrorMessage = "Team short name is required.")]
         public string TeamShortName { get; set; }
 
-        public string TeamMembers { get; set; }
-
         [Required(ErrorMessage = "Team members are required.")]
         public List<int> TeamList { get; set; }
 
         [Required(ErrorMessage = "Captain is required.")]
-        public string Captain { get; set; }
-        public string ViceCaptain { get; set; }
+        public int Captain { get; set; }
+        public int ViceCaptain { get; set; }
 
         [Required(ErrorMessage = "Wicket-keeper is required.")]
-        public string WicketKeeper { get; set; }
+        public int WicketKeeper { get; set; }
 
         public byte[] TeamIcon { get; set; }
     }

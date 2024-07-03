@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Admin - Live Cricket Updates";
+}
+
+<h2>Enter Wicket Update</h2>
+<form id="wicketForm" method="post" action="/ScoreBoard/SendWicketUpdate">
+    <div class="form-group">
+        @Html.EJS().TextBox("MatchId").Placeholder("Match ID").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().DropDownList("BatsmanId").Placeholder("Select Batsman").DataSource((IEnumerable<object>)ViewBag.Batsman).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "PlayerID", Text = "Name" }).Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().DropDownList("BowlerId").Placeholder("Select Bowler").DataSource((IEnumerable<object>)ViewBag.Bowler).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "PlayerID", Text = "Name" }).Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().DropDownList("FielderId").Placeholder("Select Fielder").DataSource((IEnumerable<object>)ViewBag.Fielder).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "PlayerID", Text = "Name" }).Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().DropDownList("WicketTypeId").Placeholder("Select Wicket Type").DataSource((IEnumerable<object>)ViewBag.WicketType).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "WicketTypeID", Text = "WicketTypeName" }).Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().TextBox("DescriptionWicket").Placeholder("Description").Render()
+    </div>
+    <button type="submit" class="btn btn-primary">Send Wicket Update</button>
+</form>
+
+<h2>Enter Bowling Update</h2>
+<form id="bowlingForm" method="post" action="/ScoreBoard/SendBowlingUpdate">
+    <div class="form-group">
+        @Html.EJS().TextBox("bowlerName").Placeholder("Bowler Name").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().NumericTextBox("overs").Placeholder("Overs").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().NumericTextBox("runs").Placeholder("Runs").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().NumericTextBox("maidens").Placeholder("Maidens").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().NumericTextBox("wickets").Placeholder("Wickets").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().NumericTextBox("economy").Placeholder("Economy").Format("n2").Render()
+    </div>
+    <div class="form-group">
+        @Html.EJS().TextBox("description").Placeholder("Description").Render()
+    </div>
+    <button type="submit" class="btn btn-primary">Send Bowling Update</button>
+</form>
+
+

@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "jquery": "^3.7.1",
+    "signalr": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.5.30",
+    "@types/signalr": "^2.4.3"
+  }
+}

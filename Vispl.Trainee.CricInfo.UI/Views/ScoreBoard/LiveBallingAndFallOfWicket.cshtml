@@ -1,0 +1,205 @@
+﻿@model IEnumerable<Vispl.Trainee.CricInfo.VO.WicketVO>
+    @{
+        ViewBag.Title = "Live Cricket";
+    }
+    <style>
+            .teams-scorecard {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .team-container {
+                width: 48%;
+            }
+
+            .team-header {
+                display: flex;
+                align-items: center;
+                border: 2px solid navy;
+                padding: 10px;
+                margin-bottom: 20px;
+                justify-content: flex-start;
+                background-color: navy;
+            }
+
+                .team-header img {
+                    width: 50px;
+                    height: auto;
+                    margin-right: 10px;
+                }
+
+                .team-header h2 {
+                    margin: 0;
+                    padding: 0 10px;
+                    color: white;
+                }
+
+            .stats-section {
+                margin-bottom: 20px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            table, th, td {
+                border: 1px solid white;
+            }
+
+                /* th, td {
+            padding: 8px;
+            text-align: center;
+        }*/
+
+                th img {
+                    width: 40px;
+                    height: 40px;
+                }
+    </style>
+    </head>
+    <body>
+        <div class="teams-scorecard">
+            <div class="team-container">
+                <div class="team-header">
+                    <img src="~/Content/Images/India.png" alt="Indian Flag" />
+                    <h2>INDIA</h2>
+                </div>
+                <div class="stats-section">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="color:navy;"><img src="~/Content/Images/bowling.jpg" alt="Ball Image" /> BOWLING</th>
+                                <th>O</th>
+                                <th>R</th>
+                                <th>M</th>
+                                <th>W</th>
+                                <th>ECO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team1-bowling">
+                            @foreach (var wicket in Model)
+                            {
+                                <tr>
+                                    <td>@wicket.BowlerId</td>
+                                    <td>@wicket.FielderId</td>
+                                    <td>@wicket.DescriptionWicket</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="team-container">
+                <div class="team-header">
+                    <img src="~/Content/Images/England.png" alt="England Flag" />
+                    <h2>ENGLAND</h2>
+                </div>
+                <div class="stats-section">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="color:navy;"><img src="~/Content/Images/wicket.jpg" alt="Wicket Image" /> FALL OF WICKETS</th>
+                                <th>Overs</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team2-wickets">
+                            @foreach (var wicket in Model)
+                            {
+                                <tr>
+                                    <td>@wicket.MatchId</td>
+                                    <td>@wicket.BatsmanId</td>
+                                    <td>@wicket.WicketTypeId</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        @section scripts {
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+            <script src="~/signalr/hubs"></script>
+            <script>
+                $(function () {
+                    var cricketHub = $.connection.cricketHub;
+
+                    cricketHub.client.updateWicket = function (wicket) {
+
+                        var rowBowl = '<tr>' +
+                            '<td>' + wicket.BowlerId + '</td>' +
+                            '<td>' + wicket.FielderId + '</td>' +
+                            '<td>' + wicket.DescriptionWicket + '</td>' +
+                            '</tr>';
+                        $('#team1-bowling').append(rowBowl);
+
+                        var row = '<tr>' +
+                            '<td>' + wicket.MatchId + '</td>' +
+                            '<td>' + wicket.BatsmanId + '</td>' +
+                            '<td>' + wicket.WicketTypeId + '</td>' +
+                            '</tr>';
+                        $('#team2-wickets').append(row);
+                    };
+
+                    $.connection.hub.start().done(function () {
+                        console.log('SignalR connected');
+                    });
+                });
+            </script>
+        }
+
+
+
+
+
+
+        @*@section scripts {
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+                <script src="~/signalr/hubs"></script>
+                <script src="~/Scripts/cricketHubClient.js" type="module"></script>
+            }*@
+
+        @*<h2>Live Bowling Updates</h2>
+            <div id="bowlingUpdates"></div>
+
+            <h2>Fall of Wickets</h2>
+            <div id="wicketUpdates"></div>
+
+            @section scripts {
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+                <script src="~/signalr/hubs"></script>
+                <script>
+                    $(function () {
+                        var cricketHub = $.connection.cricketHub;
+
+                        cricketHub.client.updateBowling = function (bowlerName, overs, runs, maidens, wickets, economy, description) {
+                            $('#bowlingUpdates').append('<p>' +
+                                bowlerName + ' - ' +
+                                'O: ' + overs + ', ' +
+                                'R: ' + runs + ', ' +
+                                'M: ' + maidens + ', ' +
+                                'W: ' + wickets + ', ' +
+                                'ECO: ' + economy + '<br>' +
+                                'Description: ' + description +
+                                '</p>');
+                        };
+
+                        cricketHub.client.updateWicket = function (batsmanName, bowlerNameWicket, descriptionWicket) {
+                            $('#wicketUpdates').append('<p>' + batsmanName + ' out by ' + bowlerNameWicket + ': ' + descriptionWicket + '</p>');
+                        };
+
+                        $.connection.hub.start().done(function () {
+                            console.log('SignalR connected');
+                        });
+                    });
+                </script>
+            }*@

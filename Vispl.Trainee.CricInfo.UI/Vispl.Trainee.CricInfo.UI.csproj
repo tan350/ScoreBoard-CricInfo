@@ -65,6 +65,12 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.4\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -196,11 +202,15 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\GridController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ScoreBoardController.cs" />
     <Compile Include="Controllers\UserAuthenticationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignalRHub\Chat.cs" />
+    <Compile Include="SignalRHub\CricketHub.cs" />
+    <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -245,6 +255,11 @@
     <Content Include="Content\ej2\material3.css" />
     <Content Include="Content\ej2\tailwind-dark.css" />
     <Content Include="Content\ej2\tailwind.css" />
+    <Content Include="Content\Images\batting.jpg" />
+    <Content Include="Content\Images\bowling.jpg" />
+    <Content Include="Content\Images\England.png" />
+    <Content Include="Content\Images\India.png" />
+    <Content Include="Content\Images\wicket.jpg" />
     <Content Include="Content\UserAuthentication.css" />
     <Content Include="Content\UserLoginLogo.jfif" />
     <Content Include="favicon.ico" />
@@ -295,6 +310,8 @@
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.3.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.3.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -329,8 +346,17 @@
     <Content Include="Views\Grid\MatchGrid.cshtml" />
     <Content Include="Views\Shared\_DateTimeWithZone.cshtml" />
     <Content Include="Views\Grid\MatchFilter.cshtml" />
+    <Content Include="Views\ScoreBoard\BattingBowlingScoreBoard.cshtml" />
+    <Content Include="Views\ScoreBoard\UpdateBowlingScoreBoard.cshtml" />
+    <Content Include="Views\ScoreBoard\ForChat.cshtml" />
+    <Content Include="Views\ScoreBoard\BallingAndFallOfWicket.cshtml" />
+    <Content Include="Views\ScoreBoard\LiveBallingAndFallOfWicket.cshtml" />
+    <Content Include="Views\ScoreBoard\UpdateConfirmation.cshtml" />
+    <Content Include="Views\ScoreBoard\Toss.cshtml" />
+    <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\cricketHubClient.ts" />
     <TypeScriptCompile Include="Scripts\ej2\ej2.d.ts" />
   </ItemGroup>
   <ItemGroup>

@@ -55,11 +55,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BattingVO.cs" />
     <Compile Include="MatchVO.cs" />
     <Compile Include="PlayerVO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TeamVO.cs" />
+    <Compile Include="TossVO.cs" />
     <Compile Include="UserVO.cs" />
+    <Compile Include="WicketVO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VISPLTrainee.snk" />

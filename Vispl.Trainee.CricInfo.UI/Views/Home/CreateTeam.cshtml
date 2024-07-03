@@ -15,13 +15,13 @@
     <div class="form-group">
         <label>Team Short Name:</label>
         @Html.EJS().TextBox("TeamShortName").Value(Model.TeamShortName).Render()
-        @Html.ValidationMessageFor(model => model.TeamShortName,"", new { @class = "text-danger" })
+        @Html.ValidationMessageFor(model => model.TeamShortName,"", new { @class = "text-danger" }) 
     </div>
 
     <div class="form-group">
         <label>Team Members:</label>
         <div>
-            @Html.EJS().MultiSelect("TeamList").Change("playerChange").DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Id").Text("Value")).Placeholder("Select team members").MaximumSelectionLength(15).Render()
+            @Html.EJS().MultiSelect("TeamList").Change("playerChange").DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(new Syncfusion.EJ2.DropDowns.MultiSelectFieldSettings {Text="Name", Value= "PlayerId" }).Placeholder("Select team members").MaximumSelectionLength(15).Render()
             @Html.ValidationMessageFor(model => model.TeamList,"", new { @class = "text-danger" })
         </div>
     </div>
@@ -29,7 +29,7 @@
     <div class="form-group">
         <label>Captain:</label>
         <div>
-            @Html.EJS().DropDownList("Captain").Change("captainChange").Placeholder("Select Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.CaptainNames).Fields(f => f.Value("Value").Text("Value")).Render()
+            @Html.EJS().DropDownList("Captain").Change("captainChange").Placeholder("Select Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.CaptainNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Text = "Name", Value = "PlayerId" }).Render()
             @Html.ValidationMessageFor(model => model.Captain,"", new { @class = "text-danger" })
         </div>
     </div>
@@ -37,7 +37,7 @@
     <div class="form-group">
         <label>Vice Captain:</label>
         <div>
-            @Html.EJS().DropDownList("ViceCaptain").Placeholder("Select Vice Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Value").Text("Value")).Render()
+            @Html.EJS().DropDownList("ViceCaptain").Placeholder("Select Vice Captain").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Text = "Name", Value = "PlayerId" }).Render()
             
         </div>
     </div>
@@ -45,7 +45,7 @@
     <div class="form-group">
         <label>Wicket Keeper:</label>
         <div>
-            @Html.EJS().DropDownList("WicketKeeper").Placeholder("Select WicketKeeper").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(f => f.Value("Value").Text("Value")).Render()
+            @Html.EJS().DropDownList("WicketKeeper").Placeholder("Select WicketKeeper").Enabled(false).DataSource((IEnumerable<object>)ViewBag.PlayerNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Text = "Name", Value = "PlayerId" }).Render()
             @Html.ValidationMessageFor(model => model.WicketKeeper, "", new { @class = "text-danger" })
         </div>
     </div>
@@ -70,7 +70,7 @@
         var players = @Html.Raw(Json.Encode(ViewBag.PlayerNames));
         var captains = @Html.Raw(Json.Encode(ViewBag.CaptainNames));
 
-        var eligibleCaptains = captains.filter(captain => selectedPlayers.includes(captain.Id));
+        var eligibleCaptains = captains.filter(captain => selectedPlayers.includes(captain.PlayerId));
 
         var captainDropdown = document.getElementById('Captain').ej2_instances[0];
         captainDropdown.dataSource = eligibleCaptains;
@@ -79,8 +79,9 @@
         captainDropdown.enabled = true;
 
         var wicketKeeperDropdown = document.getElementById('WicketKeeper').ej2_instances[0];
-        var eligiblewicketKeeper = players.filter(player => selectedPlayers.includes(player.Id));
-        wicketKeeperDropdown.dataSource = eligiblewicketKeeper;
+        var eligibleWicketKeepers = players.filter(player => selectedPlayers.includes(player.PlayerId));
+
+        wicketKeeperDropdown.dataSource = eligibleWicketKeepers;
         wicketKeeperDropdown.dataBind();
 
         wicketKeeperDropdown.enabled = true;
@@ -93,7 +94,8 @@
         var selectedPlayers = document.getElementById('TeamList').ej2_instances[0].value;
         var players = @Html.Raw(Json.Encode(ViewBag.PlayerNames));
 
-        var eligibleViceCaptains = players.filter(player => selectedPlayers.includes(player.Id) && player.Id !== selectedCaptainId && captains.some(captain => captain.Id === player.Id));
+        var eligibleViceCaptains = players.filter(player => selectedPlayers.includes(player.PlayerId) && player.PlayerId !== selectedCaptainId && captains.some(captain => captain.PlayerId === player.PlayerId));
+
         var viceCaptainDropdown = document.getElementById('ViceCaptain').ej2_instances[0];
         viceCaptainDropdown.dataSource = eligibleViceCaptains;
         viceCaptainDropdown.dataBind();

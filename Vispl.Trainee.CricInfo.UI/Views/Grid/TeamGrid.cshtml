@@ -1,45 +1,138 @@
-﻿@model IEnumerable<Vispl.Trainee.CricInfo.VO.TeamVO>
+﻿@*@model IEnumerable<Vispl.Trainee.CricInfo.VO.TeamVO>
+
+    @{
+        ViewBag.Title = "Team Details";
+        var playersid = ViewBag.PlayerName;
+        /*var childgrid = new Syncfusion.EJ2.Grids.Grid()
+        {
+            DataSource = ViewBag.PlayerName,
+            QueryString = "PlayerId",
+            Columns = new List<Syncfusion.EJ2.Grids.GridColumn>
+            {
+                new Syncfusion.EJ2.Grids.GridColumn(){ Field="Name" , HeaderText="Player Name"}
+            }
+        };*/
+    }
+
+    <h2>Team Details</h2>
+
+    @using Syncfusion.EJ2.Grids
+
+    <div id="TeamGridContainer">
+        @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.TeamVO>("TeamGrid").DataSource(Model).Columns(col =>
+        {
+            col.Field(p => p.TeamID).HeaderText("Team ID").Width("120").Add();
+            col.Field(p => p.TeamIcon).HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").AllowFiltering(false).Add();
+            col.Field(p => p.TeamName).HeaderText("Team Name").Width("200").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();
+            col.Template("<div class='player-grid' id='players-${TeamID}'>${getPlayersList(data)}</div>").HeaderText("Team Members").Width("200").Add();
+            col.Field(p => p.TeamShortName).HeaderText("Team Short Name").Width("200").Add();
+            /*col.Field(p => p.TeamMembers).HeaderText("Team Members").Width("350").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();*/
+            col.Field(p => p.Captain).HeaderText("Captain").Width("220").Add();
+            col.Field(p => p.ViceCaptain).HeaderText("Vice Captain").Width("220").Add();
+            col.Field(p => p.WicketKeeper).HeaderText("WicketKeeper").Width("220").Add();
+
+        })
+        /* .ChildGrid(childgrid)*/
+        .EnableStickyHeader(true)
+        .AllowPaging(true)
+        .PageSettings(page => page.PageSize(4))
+        .Height("400")
+        .AllowSorting(true)
+        .AllowGrouping(true)
+        .AllowFiltering(true)
+        .Render()
+        )
+    </div>*@
+
+
+@using System.Data
+@model DataTable
 
 @{
     ViewBag.Title = "Team Details";
+    var teams = Model;
+    var playersid = ViewBag.PlayerName;
 }
 
 <h2>Team Details</h2>
 
 @using Syncfusion.EJ2.Grids
 
-    <div id="TeamGridContainer">
-        @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.TeamVO>("TeamGrid").DataSource(Model).Columns(col =>
-    {
-        col.Field(p => p.TeamIcon).HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").Add();
-        col.Field(p => p.TeamName).HeaderText("Team Name").Width("200").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();
-        col.Field(p => p.TeamShortName).HeaderText("Team Short Name").Width("200").Add();
-        col.Field(p => p.TeamMembers).HeaderText("Team Members").Width("350").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();
-        col.Field(p => p.Captain).HeaderText("Captain").Width("220").Add();
-        col.Field(p => p.ViceCaptain).HeaderText("Vice Captain").Width("220").Add();
-        col.Field(p => p.WicketKeeper).HeaderText("WicketKeeper").Width("220").Add();
-
-    })
-    .AllowPaging(true)
-    .AllowSorting(true)
-    .AllowGrouping(true)
-    .AllowFiltering(true)
-    .PageSettings(page => page.PageSize(5))
-    .Render()
+<div id="TeamGridContainer">
+    @(Html.EJS().Grid<object>("TeamGrid") .DataSource(teams).Columns(col =>
+{
+    col.Field("TeamID").HeaderText("Team ID").Width("120").Add();
+    col.Field("TeamIcon").HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").AllowFiltering(false).Add();
+    col.Field("TeamName").HeaderText("Team Name").Width("200").ClipMode(Syncfusion.EJ2.Grids.ClipMode.EllipsisWithTooltip).Add();
+    col.Template("<div class='player-grid' id='players-${TeamID}'>${getPlayersList(data)}</div>").HeaderText("Team Members").Width("200").Add();
+    col.Field("TeamShortName").HeaderText("Team Short Name").Width("200").Add();
+    col.Field("Captain").HeaderText("Captain").Width("220").Add();
+    col.Field("ViceCaptain").HeaderText("Vice Captain").Width("220").Add();
+    col.Field("WicketKeeper").HeaderText("WicketKeeper").Width("220").Add();
+})
+        .EnableStickyHeader(true)
+        .AllowPaging(true)
+        .PageSettings(page => page.PageSize(4))
+        .Height(300)
+        .AllowSorting(true)
+        .AllowGrouping(true)
+        .AllowFiltering(true)
+        .Render()
     )
-    </div>
-    <div>
-        <button class="btn btn-outline-success"><a href="/Home/CreateTeam" style="text-decoration:none; color: green;">Add Team</a></button>
-    </div>
+</div>
 
-    <style>
-        .pic {
-            height: 55px;
-            width: 55px;
-            border-radius: 50px;
-            box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
-        }
-    </style>
+
+<div>
+    <button class="btn btn-outline-success"><a href="/Home/CreateTeam" style="text-decoration:none; color: green;">Add Team</a></button>
+</div>
+
+<style>
+    .pic {
+        height: 55px;
+        width: 55px;
+        border-radius: 50px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<script>
+     var players = @Html.Raw(Json.Encode(playersid));
+     function getPlayersList(data)
+    {
+         setTimeout(function() {
+             var teamPlayers = players.filter(function(p) {
+                 return p.PlayerId === data.TeamID;
+             });
+             console.log(teamPlayers);
+             var element = document.getElementById('players-' + data.TeamID);
+             if (teamPlayers.length > 0)
+            {
+                 if (element)
+                {
+                     createChildGrid(element, teamPlayers);
+                 }
+             }
+            else
+            {
+                 element.innerHTML = '';
+             }
+         }, 0);
+     }
+
+     function createChildGrid(element, data)
+    {
+         element.innerHTML = '';
+         var childGrid = new ej.grids.Grid({
+             dataSource: data,
+             columns:
+        [
+                // { type: 'checkbox', width: 50 },
+                 { field: 'Name', headerText: 'Player Name', width: 150 }
+             ]
+         });
+         childGrid.appendTo(element);
+     }
+</script>
 
 
 

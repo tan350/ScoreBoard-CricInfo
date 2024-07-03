@@ -43,31 +43,42 @@
             <div class="form-group">
                 <label>Player Type:</label>
                 <div>
-                    @Html.EJS().CheckBox("PlayerTypeFielder").Label("Fielder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("Fielder").Render()
-                    @Html.EJS().CheckBox("PlayerTypeBowler").Label("Bowler").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("Bowler").Render()
-                    @Html.EJS().CheckBox("PlayerTypeBatsman").Label("Batsman").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("Batsman").Render()
-                    @Html.EJS().CheckBox("PlayerTypeAllRounder").Label("AllRounder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("AllRounder").Change("handleAllrounderChange").Render()
+                    @Html.EJS().CheckBox("PlayerTypeBowler").Label("Bowler").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("1").Render()
+                    @Html.EJS().CheckBox("PlayerTypeBatsman").Label("Batsman").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("2").Render()
+                    @Html.EJS().CheckBox("PlayerTypeAllRounder").Label("AllRounder").LabelPosition(Syncfusion.EJ2.Buttons.LabelPosition.Before).Name("PlayerType").Value("3").Change("handleAllrounderChange").Render()
                 </div>
             </div>
 
-
             <div class="form-group">
+                <label class="control-label">Role:</label>
+                <div>
+                    @Html.EJS().RadioButton("RoleCaptain").Label("Captain").Name("Role").Value("1").Render()
+                    @Html.EJS().RadioButton("RoleViceCaptain").Label("Vice Captain").Name("Role").Value("2").Render()
+                    @Html.EJS().RadioButton("RoleWicketKeeper").Label("Wicket Keeper").Name("Role").Value("3").Render()
+                </div>
+            </div>
+
+            @*<div class="form-group">
                 <label>Is Captain:</label>
                 @Html.EJS().RadioButton("IsCaptainYes").Label("Yes").Name("IsCaptain").Value("Yes").Render()
                 @Html.EJS().RadioButton("IsCaptainNo").Label("No").Name("IsCaptain").Value("No").Render()
-            </div>
+            </div>*@
 
             <div class="form-group">
                 <label>Nationality:</label>
                 <div>
-                    @Html.EJS().DropDownList("Nationality").DataSource((IEnumerable<object>)ViewBag.NationalityList).Placeholder("Select a Nationality").Value(Model.Nationality).Render()
+                    @Html.EJS().DropDownList("Nationality").DataSource((IEnumerable<object>)ViewBag.NationalityList).Placeholder("Select a Nationality").Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings
+               {
+                   Value = "NationalityID",
+                   Text = "NationalityName"
+               }).Value(Model.Nationality).Render()
                 </div>
             </div>
 
 
             <div class="form-group">
                 <label>Team:</label>
-                @Html.EJS().DropDownList("Team").Value(Model.Team).DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "Id", Text="Value" }).Render()
+                @Html.EJS().DropDownList("Team").Value(Model.Team).DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "TeamID", Text = "TeamName" }).Render()
             </div>
 
             <div class="form-group">
@@ -150,7 +161,7 @@
         const files = imageUploader.getFilesData();
 
         const playerTypeChecked = document.querySelectorAll('input[name="PlayerType"]:checked').length > 0;
-        const isCaptainChecked = document.querySelectorAll('input[name="IsCaptain"]:checked').length > 0;
+        /*const isCaptainChecked = document.querySelectorAll('input[name="IsCaptain"]:checked').length > 0;*/
 
         const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
         const maxFileSize = 1 * 1024 * 1024; // 1 MB in bytes
@@ -185,10 +196,10 @@
             isValid = false;
         }
 
-        if (!isCaptainChecked) {
+        /*if (!isCaptainChecked) {
             errorMessages.push("Please select if the player is a captain.");
             isValid = false;
-        }
+        }*/
 
         if (!nationality) {
             errorMessages.push("Please select a Nationality.");
@@ -222,17 +233,14 @@
     function handleAllrounderChange(args) {
         if (args.checked)
         {
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].checked = false;
             document.getElementById("PlayerTypeBowler").ej2_instances[0].checked = false;
             document.getElementById("PlayerTypeBatsman").ej2_instances[0].checked = false;
 
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].disabled = true;
             document.getElementById("PlayerTypeBowler").ej2_instances[0].disabled = true;
             document.getElementById("PlayerTypeBatsman").ej2_instances[0].disabled = true;
         }
         else
         {
-            document.getElementById("PlayerTypeFielder").ej2_instances[0].disabled = false;
             document.getElementById("PlayerTypeBowler").ej2_instances[0].disabled = false;
             document.getElementById("PlayerTypeBatsman").ej2_instances[0].disabled = false;
         }

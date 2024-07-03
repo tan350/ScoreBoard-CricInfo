@@ -8,8 +8,12 @@ namespace Vispl.Trainee.CricInfo.DL.ITF
     {
         void AddRecord(PlayerVO record);
         List<PlayerVO> ReadAllRecords();
+        DataTable ReadAllRecordsDataTable();
+        List<Dictionary<string, object>> GetNationalityWithID();
         string[] GetNationalityList();
         List<PlayerListVO> GetPlayersNameList();
         List<PlayerListVO> GetCaptainNameList();
+        List<PlayerListVO> GetPlayersNameWithTeamID();
+        List<PlayerListVO> GetRoleNameWithRoleID();
     }
 }

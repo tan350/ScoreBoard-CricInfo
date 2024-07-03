@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,5 +12,6 @@ namespace Vispl.Trainee.CricInfo.DL.ITF
     {
         void AddRecord(TeamVO record);
         List<TeamVO> ReadAllRecords();
+        DataTable ReadAllRecordsDataTable();
     }
 }

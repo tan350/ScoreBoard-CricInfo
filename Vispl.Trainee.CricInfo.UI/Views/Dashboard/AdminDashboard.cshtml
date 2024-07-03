@@ -1,4 +1,8 @@
-﻿
+﻿@*@model IEnumerable<Vispl.Trainee.CricInfo.VO.MatchVO>*@
+
+@model List<Dictionary<string, object>>
+
+
 @{
     ViewBag.Title = "Admin Dashboard";
 }
@@ -6,81 +10,155 @@
 <h2>Welcome Admin!</h2>
 
 <div class="control-section">
-    @Html.EJS().DashboardLayout("DashLayout").Columns(6).ContentTemplate(@<div>
-    <div id="Dashboard" class="e-panel" data-row="0" data-col="0" data-sizeX="1" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-home"></span>
-                @Html.ActionLink("Home", "Dashboard", "Dashboard")
+    @Html.EJS().DashboardLayout("DashLayout").Columns(7).ContentTemplate(@<div>
+        <div id="Dashboard" class="e-panel" data-row="0" data-col="0" data-sizeX="1" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-home"></span>
+                    @Html.ActionLink("Home", "Dashboard", "Dashboard")
+                </div>
             </div>
         </div>
-    </div>
-    <div id="PlayerDetail" class="e-panel" data-row="0" data-col="3" data-sizeX="2" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-people"></span>
-                @Html.ActionLink("View Players", "PlayerGrid", "Grid")
-            </div>
-            <div>
-                <span>Total Players: @ViewBag.playerCount</span>
-            </div>
-        </div>
-    </div>
-    <div id="TeamDetail" class="e-panel" data-row="1" data-col="3" data-sizeX="2" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-people"></span>
-                @Html.ActionLink("View Teams", "TeamGrid", "Grid")
-            </div>
-            <div>
-                <span>Total Teams: @ViewBag.teamCount</span>
+        <div id="PlayerDetail" class="e-panel" data-row="0" data-col="3" data-sizeX="2" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-people"></span>
+                    @Html.ActionLink("View Players", "PlayerGrid", "Grid")
+                </div>
+                <div>
+                    <span>Total Players: @ViewBag.playerCount</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div id="MatchDetail" class="e-panel" data-row="2" data-col="3" data-sizeX="2" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-eye"></span>
-                @Html.ActionLink("View Scheduled Matches", "MatchGrid", "Grid")
-            </div>
-            <div>
-                <span>Total Matches: @ViewBag.matchesCount</span>
-            </div>
-        </div>
-    </div>
-    <div id="CreatePlayer" class="e-panel" data-row="0" data-col="1" data-sizeX="2" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-circle-add"></span>
-                @Html.ActionLink("Add Player", "CreatePlayer", "Home")
+        <div id="TeamDetail" class="e-panel" data-row="1" data-col="3" data-sizeX="2" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-people"></span>
+                    @Html.ActionLink("View Teams", "TeamGrid", "Grid")
+                </div>
+                <div>
+                    <span>Total Teams: @ViewBag.teamCount</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div id="CreateTeam" class="e-panel" data-row="1" data-col="0" data-sizeX="3" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-circle-add"></span>
-                @Html.ActionLink("Add Team", "CreateTeam", "Home")
+        <div id="MatchDetail" class="e-panel" data-row="2" data-col="3" data-sizeX="2" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-eye"></span>
+                    @Html.ActionLink("View Scheduled Matches", "MatchGrid", "Grid")
+                </div>
+                <div>
+                    <span>Total Matches: @ViewBag.matchesCount</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div id="CreateMatch" class="e-panel" data-row="2" data-col="1" data-sizeX="2" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-month-agenda"></span>
-                @Html.ActionLink("Schedule Match", "CreateMatch", "Home")
+        <div id="CreatePlayer" class="e-panel" data-row="0" data-col="1" data-sizeX="2" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-circle-add"></span>
+                    @Html.ActionLink("Add Player", "CreatePlayer", "Home")
+                </div>
             </div>
         </div>
-    </div>
-    <div id="FilterMatchDetail" class="e-panel" data-row="3" data-col="0" data-sizeX="1" data-sizeY="1">
-        <div class="e-panel-container">
-            <div class="text-align">
-                <span class="e-icons e-filter"></span>
-                @Html.ActionLink("Filter Matches", "MatchFilter", "Grid")
+        <div id="CreateTeam" class="e-panel" data-row="1" data-col="0" data-sizeX="3" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-circle-add"></span>
+                    @Html.ActionLink("Add Team", "CreateTeam", "Home")
+                </div>
             </div>
         </div>
-    </div>
-</div>).Render()
+        <div id="CreateMatch" class="e-panel" data-row="2" data-col="1" data-sizeX="2" data-sizeY="1">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-month-agenda"></span>
+                    @Html.ActionLink("Schedule Match", "CreateMatch", "Home")
+                </div>
+            </div>
+        </div>
+        <div id="FilterMatchDetail" class="e-panel" data-row="2" data-col="0" data-sizeX="1" data-sizeY="1">
+            <div class="e-panel-container">
+                <div style="line-height: 40px;">
+                    <span class="e-icons e-filter"></span>
+                    @Html.ActionLink("Filter Matches", "MatchFilter", "Grid")
+                </div>
+            </div>
+        </div>
+        <div id="UpdatescoreBoard" class="e-panel" data-row="3" data-col="0" data-sizeX="2" data-sizeY="2">
+            <div class="e-panel-container">
+                <div class="text-align">
+                    <span class="e-icons e-filter"></span>
+                    @Html.ActionLink("Update ScoreBoard", "BallingAndFallOfWicket", "ScoreBoard")
+                </div>
+            </div>
+        </div>
+
+
+        <div id="cardscoreBoard" class="e-panel" data-row="3" data-col="2" data-sizeX="3" data-sizeY="2">
+            <div class="e-panel-container">
+                <div tabindex="0" class="e-card" id="basic_card" style="height: 100%; width =100%; background-color: #D6B2C9;">
+                    <div class="e-card-header">
+                        <div class="e-card-header-caption">
+                            <div class="e-card-header-title">CricInfo | Live Match</div>
+                            <div class="e-card-sub-title">@DateTime.Now.ToString("dd MMMM yyyy")</div>
+                        </div>
+                    </div>
+                    <div class="e-card-content">
+                        @Html.ActionLink("Live Matches", "LiveBallingAndFallOfWicket", "ScoreBoard")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="startMatchBoard" class="e-panel" data-row="0" data-col="5" data-sizeX="2" data-sizeY="5">
+            <div class="e-panel-container">
+                <div tabindex="0" class="e-card" id="matchCard" style="height: 100%; width =100%; background-color: #D6B2C9; ">
+                    <div class="e-card-header">
+                        <div class="e-card-header-caption">
+                            <div class="e-card-header-title">CricInfo | Today's Match</div>
+                            <div class="e-card-sub-title">@DateTime.Now.ToString("dd MMMM yyyy")</div>
+                        </div>
+                    </div>
+                    <div class="e-card-content">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var match in Model)
+                            {
+                                <div class="match-detail">
+                                    <div><strong>Match Format:</strong>@match["MatchFormat"]</div>
+                                    <div>
+                                        <strong>Teams:</strong>
+                                        <img src="data:image/png;base64,@(Convert.ToBase64String((byte[])match["Team1Icon"]))" alt="Team 1 Icon" style="max-width: 50px; max-height: 50px;" />
+                                        @match["Team1ShortName"]
+                                        vs
+                                        <img src="data:image/png;base64,@(Convert.ToBase64String((byte[])match["Team2Icon"]))" alt="Team 2 Icon" style="max-width: 50px; max-height: 50px;" />
+                                        @match["Team2ShortName"]
+                                    </div>
+                                    <div><strong>Venue:</strong> @match["Venue"]</div>
+                                    <div><strong>Date & Time:</strong> @((DateTime)match["MatchDateTimeZone"])</div>
+                                </div>
+
+                                <div class="e-card-actions">
+                                    <a href="@Url.Action("Toss", "ScoreBoard", new { matchId = match["MatchID"] })" class="e-btn e-outline e-primary">
+                                        Start Match
+                                    </a>
+                                </div>
+
+                                <hr />
+                            }
+                        }
+                        else
+                        {
+                            <div>No matches scheduled for today.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>).Render()
 </div>
 <style>
     #DashLayout {
@@ -104,7 +182,7 @@
         text-decoration: none;
         background-color: transparent;
     }
-   
+
 
     .e-icons {
         color: black;

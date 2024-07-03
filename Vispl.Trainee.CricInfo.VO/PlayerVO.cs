@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Vispl.Trainee.CricInfo.RES.PlayerRES;
 
 namespace Vispl.Trainee.CricInfo.VO
 {
@@ -15,9 +14,10 @@ namespace Vispl.Trainee.CricInfo.VO
         public DateTime DateOfBirth { get; set; }
         public int Age { get; set; }
         public string BirthPlace { get; set; }
-        public string PlayerType { get; set; }
-        public string IsCaptain { get; set; }
-        public string Nationality { get; set; }
+        public int? Role { get; set; }
+        public int? PlayerType { get; set; }
+        /*public string IsCaptain { get; set; }*/
+        public int? Nationality { get; set; }
         public int? Team { get; set; }
         public int MatchesPlayed { get; set; }
         public int RunsScored { get; set; }
@@ -36,5 +36,7 @@ namespace Vispl.Trainee.CricInfo.VO
     {
         public int PlayerId { get; set; }
         public string Name { get; set; }
+
     }
+
 }

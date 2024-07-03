@@ -23,15 +23,24 @@
         let isValid = true;
 
         const fromDate = document.querySelector('#fromDate').ej2_instances[0].value;
-
         const toDate = document.querySelector('#toDate').ej2_instances[0].value;
+        const fromDateOffset = document.querySelector('#fromDateOffset').ej2_instances[0].value;
+        const toDateOffset = document.querySelector('#toDateOffset').ej2_instances[0].value;
 
         if (!fromDate) {
             alert("Please select the 'From' date.");
             isValid = false;
         }
+        else if (!fromDateOffset) {
+            alert("Please select the 'From' offset.");
+            isValid = false;
+        }
         else if (!toDate) {
             alert("Please select the 'To' date.");
+            isValid = false;
+        }
+        else if (!toDateOffset) {
+            alert("Please select the 'To' offset.");
             isValid = false;
         }
         else if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {

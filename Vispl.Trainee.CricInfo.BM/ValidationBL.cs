@@ -28,12 +28,38 @@ namespace Vispl.Trainee.CricInfo.BM
             }
         }
 
+        public DataTable ReadAllRecordsDataTable()
+        {
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.ReadAllRecordsDataTable();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
+        }
+
         public void Save(PlayerVO record)
         {
             try
             {
                 PlayerSqlDLObject = new PlayerSqlDL();
                 PlayerSqlDLObject.AddRecord(record);
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
+        }
+
+        public List<Dictionary<string, object>> GetNationalityWithID()
+        {
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.GetNationalityWithID();
             }
             finally
             {
@@ -66,6 +92,20 @@ namespace Vispl.Trainee.CricInfo.BM
                 PlayerSqlDLObject = null;
             }
         }
+
+        public List<PlayerListVO> GetPlayerNamesWithTeamID()
+        {
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.GetPlayersNameWithTeamID();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
+        }
+
         public List<PlayerListVO> GetCaptainNames()
         {
             try
@@ -79,7 +119,20 @@ namespace Vispl.Trainee.CricInfo.BM
             }
         }
 
-        
+        public List<PlayerListVO> GetRoleNameWithRoleID()
+        {
+            try
+            {
+                PlayerSqlDLObject = new PlayerSqlDL();
+                return PlayerSqlDLObject.GetRoleNameWithRoleID();
+            }
+            finally
+            {
+                PlayerSqlDLObject = null;
+            }
+        }
+
+
         public void Dispose()
         {
             if (PlayerSqlDLObject != null)

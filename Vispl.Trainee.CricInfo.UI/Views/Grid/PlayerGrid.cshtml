@@ -1,4 +1,58 @@
-﻿@model IEnumerable<Vispl.Trainee.CricInfo.VO.PlayerVO>
+﻿@*@model IEnumerable<Vispl.Trainee.CricInfo.VO.PlayerVO>
+
+        @{
+            ViewBag.Title = "Player Details";
+        }
+
+        <h2>Player Details</h2>
+
+        @using Syncfusion.EJ2.Grids
+
+        <div id="GridContainer">
+            @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.PlayerVO>("Grid")
+                .DataSource(Model)
+                .Columns(col =>
+                {
+                    col.Field(p => p.Picture).HeaderText("Picture").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${Picture}\" class=\"pic\" />").Width("150").Add();
+                    col.Field(p => p.JerseyNo).HeaderText("Jersey No").Width("120").Add();
+                    col.Field(p => p.Name).HeaderText("Name").Width("200").Add();
+                    col.Field(p => p.DateOfBirth).HeaderText("Date Of Birth").Format("dd-MM-yyyy").Width("160").Add();
+                    col.Field(p => p.Age).HeaderText("Age").Width("100").Add();
+                    col.Field(p => p.BirthPlace).HeaderText("Birth Place").Width("150").Add();
+                    col.Field(p => p.PlayerType).HeaderText("Player Type").Width("250").Add();
+                    col.Field(p => p.IsCaptain).HeaderText("Captain").Width("120").Add();
+                    col.Field(p => p.Nationality).HeaderText("Nationality").Width("150").Add();
+                    col.Field(p => p.Team).ForeignKeyField("TeamID").ForeignKeyValue("TeamName").DataSource((IEnumerable<object>) ViewBag.TeamNames).HeaderText("Team").Width("150").Add();
+                    col.Field(p => p.MatchesPlayed).HeaderText("Matches Played").Width("200").Add();
+                    col.Field(p => p.RunsScored).HeaderText("Runs Scored").Width("200").Add();
+                    col.Field(p => p.WicketsTaken).HeaderText("Wickets Taken").Width("200").Add();
+                    col.Field(p => p.BattingAverage).HeaderText("Batting Average").Width("250").Add();
+                    col.Field(p => p.BowlingAverage).HeaderText("Bowling Average").Width("250").Add();
+                    col.Field(p => p.Centuries).HeaderText("Centuries").Width("200").Add();
+                    col.Field(p => p.HalfCenturies).HeaderText("Half Centuries").Width("150").Add();
+                    col.Field(p => p.DebutDate).HeaderText("Debut Date").Format("dd-MM-yyyy").Width("150").Add();
+                    col.Field(p => p.ICCRanking).HeaderText("ICC Ranking").Width("150").Add();
+
+                })
+                .AllowPaging(true)
+                .AllowSorting(true)
+                .AllowFiltering(true)
+                .AllowGrouping(true)
+                .PageSettings(page => page.PageSize(5))
+                .Render()
+            )
+        </div>
+    <div>
+        <button class="btn btn-outline-success"><a href="/Home/CreatePlayer" style="text-decoration:none; color: green;">Add Player</a></button>
+    </div>
+    <style>
+        .pic {
+            height: 55px;
+            width: 55px;
+            border-radius: 50px;
+            box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+        }
+    </style>*@
 
 @{
     ViewBag.Title = "Player Details";
@@ -7,41 +61,51 @@
 <h2>Player Details</h2>
 
 @using Syncfusion.EJ2.Grids
+@using System.Data
+
+@model DataTable
+@{
+    ViewBag.Title = "Player Details";
+    var playerDetails = Model;
+}
 
 <div id="GridContainer">
-    @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.PlayerVO>("Grid")
-        .DataSource(Model)
+    @(Html.EJS().Grid<object>("Grid")
+        .DataSource(playerDetails)
         .Columns(col =>
         {
-            col.Field(p => p.Picture).HeaderText("Picture").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${Picture}\" class=\"pic\" />").Width("150").Add();
-            col.Field(p => p.JerseyNo).HeaderText("Jersey No").Width("120").Add();
-            col.Field(p => p.Name).HeaderText("Name").Width("200").Add();
-            col.Field(p => p.DateOfBirth).HeaderText("Date Of Birth").Format("dd-MM-yyyy").Width("160").Add();
-            col.Field(p => p.Age).HeaderText("Age").Width("100").Add();
-            col.Field(p => p.BirthPlace).HeaderText("Birth Place").Width("150").Add();
-            col.Field(p => p.PlayerType).HeaderText("Player Type").Width("250").Add();
-            col.Field(p => p.IsCaptain).HeaderText("Captain").Width("120").Add();
-            col.Field(p => p.Nationality).HeaderText("Nationality").Width("150").Add();
-            col.Field(p => p.Team).HeaderText("Team").Width("150").Add();
-            col.Field(p => p.MatchesPlayed).HeaderText("Matches Played").Width("200").Add();
-            col.Field(p => p.RunsScored).HeaderText("Runs Scored").Width("200").Add();
-            col.Field(p => p.WicketsTaken).HeaderText("Wickets Taken").Width("200").Add();
-            col.Field(p => p.BattingAverage).HeaderText("Batting Average").Width("250").Add();
-            col.Field(p => p.BowlingAverage).HeaderText("Bowling Average").Width("250").Add();
-            col.Field(p => p.Centuries).HeaderText("Centuries").Width("200").Add();
-            col.Field(p => p.HalfCenturies).HeaderText("Half Centuries").Width("150").Add();
-            col.Field(p => p.DebutDate).HeaderText("Debut Date").Format("dd-MM-yyyy").Width("150").Add();
-            col.Field(p => p.ICCRanking).HeaderText("ICC Ranking").Width("150").Add();
+            col.Field("Picture").HeaderText("Picture").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${Picture}\" class=\"pic\" />").Width("150").AllowFiltering(false).Add();
+            col.Field("JerseyNo").HeaderText("Jersey No").Width("120").Add();
+            col.Field("Name").HeaderText("Name").Width("200").Add();
+            col.Field("DateOfBirth").HeaderText("Date Of Birth").Format("dd-MM-yyyy").Width("160").Add();
+            col.Field("Age").HeaderText("Age").Width("100").Add();
+            col.Field("BirthPlace").HeaderText("Birth Place").Width("150").Add();
+            col.Field("Role").HeaderText("Role").Width("150").Add();
+            col.Field("PlayerType").HeaderText("Player Type").Width("250").Add();
+            col.Field("Nationality").HeaderText("Nationality").Width("150").Add();
+            col.Field("Team").HeaderText("Team").Width("250").Add();
+            col.Field("MatchesPlayed").HeaderText("Matches Played").Width("200").Add();
+            col.Field("RunsScored").HeaderText("Runs Scored").Width("200").Add();
+            col.Field("WicketsTaken").HeaderText("Wickets Taken").Width("200").Add();
+            col.Field("BattingAverage").HeaderText("Batting Average").Width("250").Add();
+            col.Field("BowlingAverage").HeaderText("Bowling Average").Width("250").Add();
+            col.Field("Centuries").HeaderText("Centuries").Width("200").Add();
+            col.Field("HalfCenturies").HeaderText("Half Centuries").Width("150").Add();
+            col.Field("DebutDate").HeaderText("Debut Date").Format("dd-MM-yyyy").Width("150").Add();
+            col.Field("ICCRanking").HeaderText("ICC Ranking").Width("150").Add();
 
         })
+        .EnableStickyHeader(true)
         .AllowPaging(true)
+        .PageSettings(page => page.PageSize(10))
+        .Height(300)
         .AllowSorting(true)
-        .AllowFiltering(true)
         .AllowGrouping(true)
-        .PageSettings(page => page.PageSize(5))
+        .AllowFiltering(true)
         .Render()
     )
 </div>
+
 <div>
     <button class="btn btn-outline-success"><a href="/Home/CreatePlayer" style="text-decoration:none; color: green;">Add Player</a></button>
 </div>

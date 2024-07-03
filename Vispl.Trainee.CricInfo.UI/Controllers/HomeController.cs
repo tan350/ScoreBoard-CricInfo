@@ -5,11 +5,9 @@ using System.Web;
 using System.Web.Mvc;
 using Vispl.Trainee.CricInfo.VO;
 using Vispl.Trainee.CricInfo.BM;
-using Syncfusion.EJ2.Grids;
 using Vispl.Trainee.CricInfo.RES;
 using Vispl.Trainee.CricInfo.BM.ITF;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace Vispl.Trainee.CricInfo.UI.Controllers
 {
@@ -24,13 +22,10 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
             try
             {
                 ValidationBLObject = new ValidationBL();
-                ViewBag.NationalityList = ValidationBLObject.GetNationality();
+                ViewBag.NationalityList = ValidationBLObject.GetNationalityWithID();
 
-                MatchValidationBLObject = new MatchValidationBL();
-
-                List<TeamListVO> teamNames = MatchValidationBLObject.GetTeamNamesList();
-
-                ViewBag.TeamNames = teamNames.Select(p => new { Id = p.TeamID, Value = p.TeamName }).ToList();
+                TeamValidationBLObject = new TeamValidationBL();
+                ViewBag.TeamNames = TeamValidationBLObject.ReadAllRecordsData();
 
 
                 return View(new PlayerVO { DateOfBirth = DateTime.Now, DebutDate = DateTime.Now });
@@ -41,23 +36,23 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
                 {
                     ValidationBLObject = null;
                 }
-                if (MatchValidationBLObject != null)
+                if (TeamValidationBLObject != null)
                 {
-                    MatchValidationBLObject = null;
+                    TeamValidationBLObject = null;
                 }
             }
         }
 
 
         [HttpPost]
-        public ActionResult CreatePlayer(PlayerVO player,IEnumerable<HttpPostedFileBase> Image)
+        public ActionResult CreatePlayer(PlayerVO player,IEnumerable<HttpPostedFileBase> Image/*, string PlayerType*/)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    string playersSelected = Request.Form["PlayerType"];
-                    player.PlayerType = playersSelected;
+                    /*string playersSelected = Request.Form["PlayerType"];
+                    player.PlayerType = playersSelected;*/
                     if (Image != null)
                     {
                         foreach (var file in Image)
@@ -70,12 +65,19 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
                                 }
                             }
                         }
+                        /*player.PlayerType = GetPlayerType(PlayerType);*/
 
                         ValidationBLObject = new ValidationBL();
                         ValidationBLObject.Save(player);
                     }
 
                     return RedirectToAction("PlayerGrid", "Grid");
+                }
+                else
+                {
+                    // Log ModelState errors
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                    System.Diagnostics.Debug.WriteLine(string.Join(", ", errors));
                 }
                 return View(player);
             }
@@ -89,17 +91,29 @@ namespace Vispl.Trainee.CricInfo.UI.Controllers
 
         }
 
+        public int GetPlayerType(string Player) 
+        {
+            switch (Player) 
+            {
+                case "Bowler":
+                    return 1;
+                case "Batsman":
+                    return 2;
+                case "AllRounder":
+                    return 3;
+                default:
+                    return 2;
+            }
+        }
+
         public ActionResult CreateTeam()
         {
             try
             {
                 ValidationBLObject = new ValidationBL();
 
-                List<PlayerListVO> playerNames = ValidationBLObject.GetPlayerNames();
-                List<PlayerListVO> captainNames = ValidationBLObject.GetCaptainNames();
-
-                ViewBag.PlayerNames = playerNames.Select(p => new { Id = p.PlayerId, Value = p.Name }).ToList();
-                ViewBag.CaptainNames = captainNames.Select(c => new { Id = c.PlayerId, Value = c.Name }).ToList();
+                ViewBag.PlayerNames = ValidationBLObject.GetPlayerNames();
+                ViewBag.CaptainNames = ValidationBLObject.GetCaptainNames();
 
                 return View(new TeamVO());
             }

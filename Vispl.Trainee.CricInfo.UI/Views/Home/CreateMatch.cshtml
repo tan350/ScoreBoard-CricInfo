@@ -11,14 +11,14 @@
     <div class="form-group">
         <label>Team 1:</label>
         <div>
-            @Html.EJS().DropDownList("Team1").Change("teamChange").Placeholder("Select Team1").DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.EJS().DropDownList("Team1").Change("teamChange").Placeholder("Select Team1").DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Text= "Value", Value= "Id" }).Render()
         </div>
     </div>
 
     <div class="form-group">
         <label>Team 2:</label>
         <div>
-            @Html.EJS().DropDownList("Team2").Placeholder("Select Team2").DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(f => f.Value("Id").Text("Value")).Render()
+            @Html.EJS().DropDownList("Team2").Placeholder("Select Team2").DataSource((IEnumerable<object>)ViewBag.TeamNames).DataSource((IEnumerable<object>)ViewBag.TeamNames).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Text = "Value", Value = "Id" }).Render()
         </div>
     </div>
 
@@ -32,7 +32,7 @@
     <div class="form-group">
         <label>Match Date and Time:</label>
         <div>
-            @Html.EJS().DateTimePicker("MatchDateTimeZone").Value(Model.MatchDateTimeZone).Render()
+            @Html.EJS().DateTimePickerFor(model=>model.MatchDateTimeZone).Value(Model.MatchDateTimeZone).Render()
             @Html.EJS().DropDownList("MatchOffset").DataSource((IEnumerable<object>)ViewBag.Offset).Fields(f => f.Value("value").Text("Text")).Render()
         </div>
     </div>

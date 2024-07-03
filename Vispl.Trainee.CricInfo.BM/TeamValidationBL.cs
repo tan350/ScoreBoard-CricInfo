@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,18 @@ namespace Vispl.Trainee.CricInfo.BM
             }
         }
 
+        public DataTable ReadAllRecordsDataTable()
+        {
+            try
+            {
+                TeamSqlDLObject = new TeamSqlDL();
+                return TeamSqlDLObject.ReadAllRecordsDataTable();
+            }
+            finally
+            {
+                TeamSqlDLObject = null;
+            }
+        }
         public void Save(TeamVO record)
         {
             try
