@@ -14,14 +14,14 @@ namespace Vispl.Trainee.CricInfo.UI.SignalRHub
             Clients.All.updateBowling(bowlerName, overs, runs, maidens, wickets, economy, description);
         }
 
-        public void SendWicketUpdate(string batsmanName, string bowlerNameWicket, string descriptionWicket)
-        {
-            Clients.All.updateWicket(batsmanName, bowlerNameWicket, descriptionWicket);
-        }
-
         public void SendWicketUpdate(WicketVO wicket)
         {
             Clients.All.updateWicket(wicket);
+        }
+
+        public void SendCommentary(string commentary)
+        {
+            Clients.All.updateCommentary(commentary);
         }
     }
 }

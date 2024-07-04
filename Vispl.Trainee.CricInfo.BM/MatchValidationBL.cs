@@ -239,6 +239,19 @@ namespace Vispl.Trainee.CricInfo.BM
             }
         }
 
+        public List<PlayerListVO> GetBattingOrderPlayers(int matchId, int teamId)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                return MatchSqlDLObject.GetBattingOrderPlayers(matchId, teamId);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+        }
+
         public void SaveWicketData(WicketVO wicket)
         {
             try

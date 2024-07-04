@@ -346,7 +346,6 @@
     <Content Include="Views\Grid\MatchGrid.cshtml" />
     <Content Include="Views\Shared\_DateTimeWithZone.cshtml" />
     <Content Include="Views\Grid\MatchFilter.cshtml" />
-    <Content Include="Views\ScoreBoard\BattingBowlingScoreBoard.cshtml" />
     <Content Include="Views\ScoreBoard\UpdateBowlingScoreBoard.cshtml" />
     <Content Include="Views\ScoreBoard\ForChat.cshtml" />
     <Content Include="Views\ScoreBoard\BallingAndFallOfWicket.cshtml" />

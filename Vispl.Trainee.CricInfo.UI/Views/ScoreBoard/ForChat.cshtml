@@ -42,6 +42,8 @@
         // Set initial focus to message input box.
         $('#message').focus();
         // Start the connection.
+
+        console.log($.connection.hub);
         $.connection.hub.start().done(function () {
             $('#sendmessage').click(function () {
                 // Call the Send method on the hub.

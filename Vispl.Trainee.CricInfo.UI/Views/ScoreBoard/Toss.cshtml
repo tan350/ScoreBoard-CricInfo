@@ -106,14 +106,14 @@
            chips.Text("Bowling").Enabled(true).Add();
        }).Render()
 
-            <button id="continueButton" type="submit" class="e-outline e-primary">Continue</button>
+            <button id="continueButton" type="button" class="e-outline e-primary">Continue</button>
         }
 
     </div>
 </div>
 
 
-@*============================================Toss Script==========================================*@
+@*==========================================================================Toss Script==========================================*@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -185,23 +185,50 @@
 
         tossSection.style.display = 'none';
         matchDetailsSection.style.display = 'block';
+
+
+        const form = document.getElementById('tossForm');
+
+        if (!form) {
+            alert("Error: Toss form not found.");
+            return;
+        }
+
+        // Submit the form using AJAX for asynchronous handling
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert("Failed to save toss decision.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred while saving toss decision.");
+            });
     }
+
 </script>
 
 
-@*================================================Update Score===============================================================*@
+@*============================================================Update Score===============================================================*@
 <div id="match-details-section" style="display:none;">
     <div>
         <label>Select Player on Strike:</label>
-        @Html.EJS().DropDownList("playerOnStrike").Placeholder("Select player on strike").Render()
+        @Html.EJS().DropDownList("playerOnStrike").Placeholder("Select player on strike").DataSource((IEnumerable<object>)ViewBag.PlayerListOrdered).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "PlayerId", Text = "Name" }).Render()
     </div>
     <div>
         <label>Select Player off Strike:</label>
-        @Html.EJS().DropDownList("playerOffStrike").Placeholder("Select player off strike").Render()
+        @Html.EJS().DropDownList("playerOffStrike").Placeholder("Select player off strike").DataSource((IEnumerable<object>)ViewBag.PlayerListOrdered).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "PlayerId", Text = "Name" }).Render()
     </div>
     <div>
         <label>Select Bowler:</label>
-        @Html.EJS().DropDownList("bowler").Placeholder("Select Bowler").Render()
+        @Html.EJS().DropDownList("bowler").Placeholder("Select Bowler").DataSource((IEnumerable<object>)ViewBag.BowlerOpposed).Fields(new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings { Value = "PlayerID", Text = "Name" }).Render()
     </div>
     @Html.EJS().ChipList("scoreUpdate").Selection(Selection.Single).CssClass("e-outline e-primary").Chips(chips =>
     {
@@ -230,20 +257,46 @@
         chips.Text("Hit Wicket").Add();
     }).Render()
 
+    @Html.EJS().Button("updateScoreButton").Content("Update Score").CssClass("e-outline e-info").Render()
 </div>
-@*============================================Update Score Script==========================================*@
+@*================================================================Update Score Script===========================================================*@
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+<script src="~/signalr/hubs"></script>
+
 
 <script>
+    // Initialize SignalR
+    var selectedChip = '';
+    var cricketHub = $.connection.cricketHub;
+    $.connection.hub.start()
+        .done(function () {
+            console.log("SignalR connection established.")
+            /*console.log(cricketHub);
+            cricketHub.server.sendCommentary("ram ram");*/
+        })
+        .fail(function (error) {
+            console.error('SignalR connection error: ' + error);
+        });
+
+    cricketHub.client.updateCommentary = function (commentary) {
+        const newCommentary = document.createElement('p');
+        newCommentary.innerText = commentary;
+        document.getElementById('commentaryContent').prepend(newCommentary);
+    };
+
+
     document.addEventListener('DOMContentLoaded', function () {
         var extrasChips = document.getElementById('extrasChips');
         var outChips = document.getElementById('outChips');
-
+        
         // Initially hide extrasChips and outChips
         extrasChips.style.display = 'none';
         outChips.style.display = 'none';
 
         document.getElementById('scoreUpdate').addEventListener('click', function (args) {
-            var selectedChip = args.target.innerText.trim();
+            selectedChip = args.target.innerText.trim();
 
             if (selectedChip === 'Extras') {
                 extrasChips.style.display = 'block';
@@ -257,9 +310,53 @@
             }
         });
     });
+
+    document.getElementById('updateScoreButton').addEventListener('click', function () {
+        var chipText = selectedChip;
+        if (!chipText) {
+            alert('Please select a score update chip first.');
+            return;
+        }
+
+        const playerOnStrike = document.getElementById('playerOnStrike').ej2_instances[0].text;
+        const playerOffStrike = document.getElementById('playerOffStrike').ej2_instances[0].text;
+        const bowler = document.getElementById('bowler').ej2_instances[0].text;
+
+        let commentaryText = `${playerOnStrike}`;
+
+        switch (chipText) {
+            case '1 Run':
+            case '2 Runs':
+            case '3 Runs':
+            case '4 Runs':
+            case '6 Runs':
+                commentaryText += ` scored ${chipText} off ${bowler}'s delivery.`;
+                break;
+            case 'No Ball':
+            case 'Wide Ball':
+                commentaryText += ` benefited from a ${chipText} by ${bowler}.`;
+                break;
+            case 'Catch Out':
+            case 'Run Out':
+            case 'Bowled Out':
+            case 'LBW':
+            case 'Stumped':
+            case 'Hit Wicket':
+                commentaryText += ` got out ${chipText} by ${bowler}.`;
+                break;
+            default:
+                commentaryText += ` performed an action: ${chipText}.`;
+                break;
+        }
+        console.log(cricketHub);
+        cricketHub.server.sendCommentary(commentaryText);
+           
+    });
+        
 </script>
 
-@*================================================Team Players List ===============================================================*@
+
+@*====================================================================Team Players List ===============================================================*@
 <div id="team-players" style="display:none;">
     <div class="listbox-control">
         <h4>@Model["Team1Name"]</h4>
@@ -275,7 +372,7 @@
         @Html.EJS().ListBox("listbox2").AllowDragAndDrop(true).Created("groupBCreated").Height("330px").Fields(new Syncfusion.EJ2.DropDowns.ListBoxFieldSettings { Text = "Name", Value = "PlayerID" }).ItemTemplate("itemTemplate").Render()
     </div>
 </div>
-@*================================================Team Players Style===============================================================*@
+@*======================================================================Team Players Style===============================================================*@
 <style>
     #team-players {
         /*display: flex !important;*/
@@ -292,7 +389,7 @@
     }
 </style>
 
-@*=====================================================Team Players Script=======================================================================*@
+@*===============================================================Team Players Script=======================================================================*@
 @using Newtonsoft.Json
 <script>
     var team1Players = @Html.Raw(JsonConvert.SerializeObject(ViewBag.Team1Players));
@@ -359,7 +456,7 @@
     });
 </script>
 
-@*=================================================Bowling and Fall of Wicket========================================================================*@
+@*======================================================Bowling and Fall of Wicket========================================================================*@
 <div id="Fow" style="display:none;">
     <div class="gridbowling">
         <h3>Bowling</h3>
@@ -404,7 +501,7 @@
     </div>
 </div>
 
-@*=================================================Batting with Inning========================================================================*@
+@*=========================================================Batting with Inning========================================================================*@
 
 <div id="Batting" style="display:none;">
     <div class="navbar-block">
@@ -458,7 +555,7 @@
 
 
 
-@*===========================================Batting with Inning Style==========================================*@
+@*========================================================================Batting with Inning Style=======================================================*@
 <style>
     #Batting {
         display: flex;
@@ -530,7 +627,7 @@
     }
 </style>
 
-@*============================================Batting with Inning Script========================================*@
+@*=============================================Batting with Inning Script=============================================================*@
 <script>
     function showInningSection(sectionId) {
         var team1Inning = document.getElementById('team1-inning');
@@ -546,37 +643,42 @@
     }
 </script>
 
+@*<script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var battings = @Html.Raw(ViewBag.BattingsJson);
 
+                var tableBody = document.querySelector("#battingTable tbody");
 
+                battings.forEach(function(batting) {
+                    var row = document.createElement("tr");
 
-<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var battings = @Html.Raw(ViewBag.BattingsJson);
+                    // Fetch player name from another source if necessary
+                    var playerName = "Player " + batting.PlayerId; // Placeholder for actual player name fetching logic
 
-            var tableBody = document.querySelector("#battingTable tbody");
+                    var cells = [
+                        playerName,
+                        batting.Runs,
+                        batting.Balls,
+                        batting.Fours,
+                        batting.Sixes,
+                        batting.StrikeRate.toFixed(2)
+                    ];
 
-            battings.forEach(function(batting) {
-                var row = document.createElement("tr");
+                    cells.forEach(function(cellData) {
+                        var cell = document.createElement("td");
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
+                    });
 
-                // Fetch player name from another source if necessary
-                var playerName = "Player " + batting.PlayerId; // Placeholder for actual player name fetching logic
-
-                var cells = [
-                    playerName,
-                    batting.Runs,
-                    batting.Balls,
-                    batting.Fours,
-                    batting.Sixes,
-                    batting.StrikeRate.toFixed(2)
-                ];
-
-                cells.forEach(function(cellData) {
-                    var cell = document.createElement("td");
-                    cell.textContent = cellData;
-                    row.appendChild(cell);
+                    tableBody.appendChild(row);
                 });
-
-                tableBody.appendChild(row);
             });
-        });
-</script>
+    </script>*@
+
+
+@*=============================================Commentary=============================================================*@
+<div id="Commentary" class="Commentary" style="display: block; background-color: royalblue; height: 200px;">
+    <div id="commentaryContent"></div>
+</div>
+
+@*====================================================================================================================*@

@@ -24,6 +24,7 @@ namespace Vispl.Trainee.CricInfo.BM.ITF
         List<Dictionary<string, object>> GetPlayersByTeamID(int teamID);
         List<Dictionary<string, object>> GetWicketTypes();
         List<Dictionary<string, object>> GetPlayersByTeamIDAndPlayerType(int teamID, int playerType);
+        List<PlayerListVO> GetBattingOrderPlayers(int matchId, int teamId);
         void SaveWicketData(WicketVO wicket);
         List<WicketVO> GetWicketsByMatchId(int matchId);
         void SaveBattingOrder(List<int> team1PlayerIds, List<int> team2PlayerIds, int matchId, int team1Id, int team2Id);

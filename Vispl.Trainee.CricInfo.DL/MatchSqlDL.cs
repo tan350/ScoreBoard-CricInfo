@@ -621,6 +621,39 @@ JOIN
             return players;
         }
 
+        public List<PlayerListVO> GetBattingOrderPlayers(int matchId, int teamId)
+        {
+            List<PlayerListVO> players = new List<PlayerListVO>();
+
+            string query = @"SELECT p.PlayerId, p.Name
+            FROM Players p
+            JOIN Batting b ON p.PlayerId = b.PlayerId
+            WHERE b.MatchId = @MatchId AND p.TeamId = @TeamId
+            ORDER BY b.BattingId;";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@MatchId", matchId);
+                command.Parameters.AddWithValue("@TeamId", teamId);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    PlayerListVO player = new PlayerListVO();
+                    player.PlayerId = Convert.ToInt32(reader["PlayerId"]);
+                    player.Name = Convert.ToString(reader["Name"]);
+                    players.Add(player);
+                }
+
+                reader.Close();
+            }
+
+            return players;
+        }
+
         public void SaveWicketData(WicketVO wicket)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))

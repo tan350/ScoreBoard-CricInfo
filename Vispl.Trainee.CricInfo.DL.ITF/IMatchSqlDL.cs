@@ -22,6 +22,7 @@ namespace Vispl.Trainee.CricInfo.DL.ITF
         MatchVO GetMatchByID(int matchId);
         Dictionary<string, object> GetMatchListByID(int matchId);
         List<Dictionary<string, object>> GetPlayersByTeamID(int teamID);
+        List<PlayerListVO> GetBattingOrderPlayers(int matchId, int teamId);
         List<Dictionary<string, object>> GetWicketTypes();
         List<Dictionary<string, object>> GetPlayersByTeamIDAndPlayerType(int teamID, int playerType);
         void SaveWicketData(WicketVO wicket);
