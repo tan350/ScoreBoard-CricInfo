@@ -55,10 +55,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BallCommentaryVO.cs" />
+    <Compile Include="BallVO.cs" />
     <Compile Include="BattingVO.cs" />
+    <Compile Include="BowlingVO.cs" />
+    <Compile Include="MatchInningVO.cs" />
+    <Compile Include="MatchOutcomeVO.cs" />
     <Compile Include="MatchVO.cs" />
     <Compile Include="PlayerVO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultOfMatchVO.cs" />
     <Compile Include="TeamVO.cs" />
     <Compile Include="TossVO.cs" />
     <Compile Include="UserVO.cs" />

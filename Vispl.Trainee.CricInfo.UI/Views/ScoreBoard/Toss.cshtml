@@ -77,6 +77,9 @@
         if (selectedSection == teamPlayersSection) {
             selectedSection.style.display = 'flex';
         }
+        else if (selectedSection == Fow) {
+            selectedSection.style.display = 'flex';
+        }
         else if (selectedSection) {
             selectedSection.style.display = 'block';
         } else {
@@ -176,15 +179,15 @@
         tossDecisionTextbox.value = decision;
 
         const tossSection = document.getElementById('toss-section');
-        const matchDetailsSection = document.getElementById('match-details-section');
+        const teamPlayersSection = document.getElementById('team-players');
 
-        if (!tossSection || !matchDetailsSection) {
+        if (!tossSection || !teamPlayersSection) {
             alert("Error: Required sections not found.");
             return;
         }
 
         tossSection.style.display = 'none';
-        matchDetailsSection.style.display = 'block';
+        teamPlayersSection.style.display = 'flex';
 
 
         const form = document.getElementById('tossForm');
@@ -267,9 +270,22 @@
 
 
 <script>
+    // Assign Razor model values to JavaScript variables
+    var team1ID = '@Model["Team1ID"]';
+    var team2ID = '@Model["Team2ID"]';
+
     // Initialize SignalR
     var selectedChip = '';
     var cricketHub = $.connection.cricketHub;
+    var ballsBowled = 0; // Total valid balls bowled in the match
+    var ballsInOver = 0; // Balls bowled in the current over
+    var overNumber = 1;  // Start with the first over
+    var currentInning = 1; // Start with the first inning
+    var wicketsLost = 0; // Wickets lost in the current inning
+    var runsScoredInInning = 0; // Runs scored in the current inning
+    var battingTeamID = team1ID; // Initial Batting Team ID
+    var bowlingTeamID = team2ID; // Initial Bowling Team ID
+    var matchID = @Model["MatchID"];
     $.connection.hub.start()
         .done(function () {
             console.log("SignalR connection established.")
@@ -290,7 +306,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var extrasChips = document.getElementById('extrasChips');
         var outChips = document.getElementById('outChips');
-        
+
         // Initially hide extrasChips and outChips
         extrasChips.style.display = 'none';
         outChips.style.display = 'none';
@@ -309,6 +325,29 @@
                 outChips.style.display = 'none';
             }
         });
+
+
+        // Add event listener for outChips
+        document.getElementById('outChips').addEventListener('click', function (args) {
+            selectedChip = args.target.innerText.trim();
+
+            if (selectedChip === 'Catch Out' || selectedChip === 'Run Out' || selectedChip === 'Bowled Out' ||
+                selectedChip === 'LBW' || selectedChip === 'Stumped' || selectedChip === 'Hit Wicket') {
+
+                // Ensure updateScoreButton is aware of the selected dismissal chip
+                document.getElementById('updateScoreButton').click();
+            }
+        });
+
+        // Add event listener for extrasChips
+        document.getElementById('extrasChips').addEventListener('click', function (args) {
+            selectedChip = args.target.innerText.trim();
+
+            if (selectedChip === 'No Ball' || selectedChip === 'Wide Ball') {
+                document.getElementById('updateScoreButton').click();
+            }
+        });
+
     });
 
     document.getElementById('updateScoreButton').addEventListener('click', function () {
@@ -321,20 +360,47 @@
         const playerOnStrike = document.getElementById('playerOnStrike').ej2_instances[0].text;
         const playerOffStrike = document.getElementById('playerOffStrike').ej2_instances[0].text;
         const bowler = document.getElementById('bowler').ej2_instances[0].text;
+        const playerOnStrikeId = document.getElementById('playerOnStrike').ej2_instances[0].value;
+        const playerOffStrikeId = document.getElementById('playerOffStrike').ej2_instances[0].value;
+        const bowlerId = document.getElementById('bowler').ej2_instances[0].value;
 
+        // Initialize default values for batting statistics
+        let runs = 0, balls = 1, fours = 0, sixes = 0, extras = 0;
         let commentaryText = `${playerOnStrike}`;
 
+        // Update batting statistics and commentary based on selected chip
         switch (chipText) {
             case '1 Run':
+                runs = 1;
+                commentaryText += ` scored 1 run off ${bowler}'s delivery.`;
+                break;
             case '2 Runs':
+                runs = 2;
+                commentaryText += ` scored 2 runs off ${bowler}'s delivery.`;
+                break;
             case '3 Runs':
+                runs = 3;
+                commentaryText += ` scored 3 runs off ${bowler}'s delivery.`;
+                break;
             case '4 Runs':
+                runs = 4;
+                fours = 1;
+                commentaryText += ` hit a boundary off ${bowler}'s delivery.`;
+                break;
             case '6 Runs':
-                commentaryText += ` scored ${chipText} off ${bowler}'s delivery.`;
+                runs = 6;
+                sixes = 1;
+                commentaryText += ` hit a six off ${bowler}'s delivery.`;
                 break;
             case 'No Ball':
+                balls = 0; // No ball does not count as a valid ball
+                extras = 1;  // No ball gives one extra run
+                commentaryText += ` benefited from a No Ball by ${bowler}.`;
+                break;
             case 'Wide Ball':
-                commentaryText += ` benefited from a ${chipText} by ${bowler}.`;
+                balls = 0; // Wide ball does not count as a valid ball
+                extras = 1;  // Wide ball gives one extra run
+                commentaryText += ` benefited from a Wide Ball by ${bowler}.`;
                 break;
             case 'Catch Out':
             case 'Run Out':
@@ -342,17 +408,210 @@
             case 'LBW':
             case 'Stumped':
             case 'Hit Wicket':
+                // Increment wicketsLost
+                wicketsLost++;
+
+                // Prepare data for fall of wicket
+                const wicketType = getWicketTypeId(chipText);
+
+                // Update commentary for wicket taken
                 commentaryText += ` got out ${chipText} by ${bowler}.`;
-                break;
+
+                // Send AJAX request to update fall of wicket
+                $.ajax({
+                    type: 'POST',
+                    url: '/ScoreBoard/UpdateFallOfWicket', // Endpoint to handle fall of wicket update
+                    data: {
+                        matchId: matchID,
+                        batsmanId: playerOnStrikeId,
+                        bowlerId: bowlerId,
+                        wicketTypeId: wicketType,
+                        fielderId: null, // You may need to modify this to include fielder if available
+                        inningNumber: currentInning,
+                        runsScored: runsScoredInInning,
+                        wicketsLost: wicketsLost,
+                        oversBowled: overNumber - 1 + (ballsInOver - 1) / 6
+                    },
+                    success: function (response) {
+                        // Update UI commentary via SignalR
+                        cricketHub.server.sendCommentary(commentaryText);
+
+                        alert(response.message);
+                    },
+                    error: function (error) {
+                        console.error('Error updating fall of wicket:', error);
+                        alert('Error updating fall of wicket. Please try again.');
+                    }
+                });
+                return; // Exit the function since wicket update is handled
+                /*break;*/
             default:
                 commentaryText += ` performed an action: ${chipText}.`;
                 break;
         }
-        console.log(cricketHub);
-        cricketHub.server.sendCommentary(commentaryText);
-           
+
+        // Calculate Strike Rate
+        const strikeRate = ballsBowled === 0 ? 0 : ((runs / ballsBowled) * 100).toFixed(2);
+
+        // Increment ball number and over number only for valid balls
+        if (balls === 1) {
+            ballsBowled++;
+            ballsInOver++;
+            runsScoredInInning += runs;
+            if (ballsInOver > 6) {
+                ballsInOver = 1;
+                overNumber++;
+            }
+        } else {
+            // Increment runs for extra balls
+            runsScoredInInning += extras;
+        }
+
+        // Check if the inning should end
+        const maxOvers = 20; // Max overs per inning
+        const maxWickets = 10; // Max wickets per inning
+
+        if (overNumber > maxOvers || wicketsLost >= maxWickets) {
+            // Post inning data
+            $.ajax({
+                type: 'POST',
+                url: '/ScoreBoard/EndInning', // Endpoint to handle the end of an inning
+                data: {
+                    matchID: matchID,
+                    inningNumber: currentInning,
+                    battingTeamID: battingTeamID,
+                    bowlingTeamID: bowlingTeamID,
+                    runsScored: runsScoredInInning,
+                    wicketsLost: wicketsLost,
+                    oversBowled: overNumber - 1 + (ballsInOver - 1) / 6
+                },
+                success: function (response) {
+                    // Inform about the new inning start
+                    cricketHub.server.sendCommentary(`Inning ${currentInning} ended. Starting Inning ${currentInning + 1}.`);
+
+                    alert(response.message);
+
+                    // Transition to the next inning
+                    currentInning++;
+                    ballsBowled = 0;
+                    ballsInOver = 0;
+                    overNumber = 1;
+                    wicketsLost = 0;
+                    runsScoredInInning = 0;
+
+                    // Swap batting and bowling teams for the next inning
+                    var temp = battingTeamID;
+                    battingTeamID = bowlingTeamID;
+                    bowlingTeamID = temp;
+                },
+                error: function (error) {
+                    console.error('Error ending inning:', error);
+                    alert('Error ending inning. Please try again.');
+                }
+            });
+        }
+
+
+        // Send AJAX request to update batting stats
+        $.ajax({
+            type: 'POST',
+            url: '/ScoreBoard/UpdateBattingStats', // Replace with your server endpoint to update batting stats
+            data: {
+                playerOnStrikeId: playerOnStrikeId,
+                playerOffStrikeId: playerOffStrikeId,
+                bowlerId: bowlerId,
+                runs: runs,
+                balls: balls, // Use the balls variable to indicate valid or extra balls
+                ballsBowled: ballsBowled, // Total valid balls bowled
+                fours: fours,
+                sixes: sixes,
+                strikeRate: strikeRate,
+                ballNumber: ballsInOver, // Current ball number within the over
+                overNumber: overNumber,   // Current over number
+                currentInning: currentInning // Current inning number
+            },
+            success: function (response) {
+                // Update UI commentary via SignalR
+                cricketHub.server.sendCommentary(commentaryText);
+                alert(response.message);
+            },
+            error: function (error) {
+                console.error('Error updating batting stats:', error);
+                alert('Error updating batting stats. Please try again.');
+            }
+        });
+
+        // Send AJAX request to update Ball table for each valid ball bowled
+        for (let i = 0; i < balls; i++) {
+            $.ajax({
+                type: 'POST',
+                url: '/ScoreBoard/UpdateBall',
+                data: {
+                    inningId: 8, /*inningId,*/ // Ensure to set the correct value
+                    overNumber: overNumber,
+                    ballNumber: ballsInOver - balls + i + 1,
+                    bowlerId: bowlerId,
+                    batsmanId: playerOnStrikeId,
+                    runsScored: runs,
+                    wicketId: 0 // Modify this as per actual logic
+                },
+                success: function (response) {
+                    alert(response.message);
+                },
+                error: function (error) {
+                    console.error('Error updating Ball table:', error);
+                    alert('Error updating Ball table. Please try again.');
+                }
+            });
+        }
+
+        // Send AJAX request to update Bowling table
+        $.ajax({
+            type: 'POST',
+            url: '/ScoreBoard/UpdateBowlingStats',
+            data: {
+                bowlerId: bowlerId,
+                teamId: bowlingTeamID, // Update with the correct team ID
+                matchId: matchID,
+                totalOver: overNumber - 1 + (ballsInOver - 1) / 6,
+                runsScored: runs,
+                maiden: 0, // Adjust as per your logic
+                wicketId: 0, // Modify this as per actual logic
+                eco: 0 // Adjust as per your logic
+            },
+            success: function (response) {
+                alert(response.message);
+            },
+            error: function (error) {
+                console.error('Error updating Bowling table:', error);
+                alert('Error updating Bowling table. Please try again.');
+            }
+        });
+
+        /*console.log(cricketHub);
+        cricketHub.server.sendCommentary(commentaryText);*/
     });
-        
+
+    function getWicketTypeId(wicketTypeText) {
+        switch (wicketTypeText) {
+            case 'Catch Out':
+                return 1;
+            case 'Bowled Out':
+                return 2;
+            case 'Run Out':
+                return 3;
+            case 'LBW':
+                return 4;
+            case 'Stumped':
+                return 5;
+            case 'Hit Wicket':
+                return 6;
+            default:
+                return 0; // Handle default case appropriately
+        }
+    }
+
+
 </script>
 
 
@@ -453,106 +712,263 @@
         };
         console.log(data);
         xhr.send(data);
+
+        const teamPlayersSection = document.getElementById('team-players');
+        const matchDetailSection = document.getElementById('match-details-section');
+
+        if (!matchDetailSection || !teamPlayersSection) {
+            alert("Error: Required sections not found.");
+            return;
+        }
+
+        teamPlayersSection.style.display = 'none';
+        matchDetailSection.style.display = 'block';
     });
 </script>
 
 @*======================================================Bowling and Fall of Wicket========================================================================*@
-<div id="Fow" style="display:none;">
-    <div class="gridbowling">
-        <h3>Bowling</h3>
-        @{
-            // Dummy data for Bowling Grid
-            var bowlingData = new List<object>
-                {
-                new { Player = "Player 1", Overs = 4.2, RunsConceded = 25 },
-                new { Player = "Player 2", Overs = 3.5, RunsConceded = 18 }
-            };
+<style>
+    .teams-scorecard {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 20px;
+    }
 
-            // Render Syncfusion Grid for Bowling
-            var bowlingGrid = Html.EJS().Grid("bowlingGrid").DataSource(bowlingData).Columns(cols =>
-            {
-                cols.Field("Player").HeaderText("Player").Width("150").Add();
-                cols.Field("Overs").HeaderText("Overs").Width("150").Add();
-                cols.Field("RunsConceded").HeaderText("Runs Conceded").Width("150").Add();
-            }).Render();
-            @Html.Raw(bowlingGrid)
+    .team-container {
+        width: 48%;
+    }
+
+    .team-header {
+        display: flex;
+        align-items: center;
+        border: 2px solid navy;
+        padding: 10px;
+        margin-bottom: 20px;
+        justify-content: flex-start;
+        background-color: navy;
+        height: 80px;
+    }
+
+        .team-header img {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
         }
+
+        .team-header h3 {
+            margin: 0;
+            padding: 0 10px;
+            color: white;
+        }
+
+    .stats-section {
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    table, th, td {
+        border: 1px solid white;
+    }
+
+        /* th, td {
+          padding: 8px;
+          text-align: center;
+      }*/
+
+        th img {
+            width: 40px;
+            height: 40px;
+        }
+</style>
+
+@{
+    var fallOfWicket = ViewBag.FallOfWicket as List<Vispl.Trainee.CricInfo.VO.WicketVO>;
+}
+
+<div id="Fow" style="display:none;" class="teams-scorecard">
+    <div class="team-container">
+        <div class="team-header">
+            <img src="data:image/png;base64,@(Convert.ToBase64String((byte[])Model["Team1Icon"]))" alt="Indian Flag" />
+            <h3>@Model["Team1Name"]</h3>
+        </div>
+        <div class="stats-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="color:navy;"><img src="~/Content/Images/bowling.jpg" alt="Ball Image" /> BOWLING</th>
+                        <th>O</th>
+                        <th>R</th>
+                        <th>M</th>
+                        <th>W</th>
+                        <th>ECO</th>
+                    </tr>
+                </thead>
+                <tbody id="team1-bowling">
+                    @if (fallOfWicket != null)
+                    {
+                        foreach (var wicket in fallOfWicket)
+                        {
+                            <tr>
+                                <td>@wicket.BowlerId</td>
+                                <td>@wicket.FielderId</td>
+                                <td>@wicket.DescriptionWicket</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="gridwicket">
-        <h3>Fall of Wicket</h3>
-        @{
-            // Dummy data for Fall of Wicket Grid
-            var fowData = new List<object>
-                {
-                new { WicketNumber = 1, PlayerOut = "Player A", RunsScored = 10 },
-                new { WicketNumber = 2, PlayerOut = "Player B", RunsScored = 15 }
-            };
-
-            // Render Syncfusion Grid for Fall of Wicket
-            var fowGrid = Html.EJS().Grid("fowGrid").DataSource(fowData).Columns(cols =>
-            {
-                cols.Field("WicketNumber").HeaderText("Wicket Number").Width("150").Add();
-                cols.Field("PlayerOut").HeaderText("Player Out").Width("150").Add();
-                cols.Field("RunsScored").HeaderText("Runs Scored").Width("150").Add();
-            }).Render();
-            @Html.Raw(fowGrid)
-        }
+    <div class="team-container">
+        <div class="team-header">
+            <img src="data:image/png;base64,@(Convert.ToBase64String((byte[])Model["Team2Icon"]))" alt="England Flag" />
+            <h3>@Model["Team2Name"]</h3>
+        </div>
+        <div class="stats-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="color:navy;"><img src="~/Content/Images/wicket.jpg" alt="Wicket Image" /> FALL OF WICKETS</th>
+                        <th>Overs</th>
+                    </tr>
+                </thead>
+                <tbody id="team2-wickets">
+                    @if (fallOfWicket != null)
+                    {
+                        foreach (var wicket in fallOfWicket)
+                        {
+                            <tr>
+                                <td>@wicket.MatchId</td>
+                                <td>@wicket.BatsmanId</td>
+                                <td>@wicket.WicketTypeId</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-@*=========================================================Batting with Inning========================================================================*@
 
-<div id="Batting" style="display:none;">
+<script>
+    $(function () {
+       /* var cricketHub = $.connection.cricketHub;*/
+
+        cricketHub.client.updateWicket = function (wicket) {
+
+            var rowBowl = '<tr>' +
+                '<td>' + wicket.BowlerId + '</td>' +
+                '<td>' + wicket.FielderId + '</td>' +
+                '<td>' + wicket.DescriptionWicket + '</td>' +
+                '</tr>';
+            $('#team1-bowling').append(rowBowl);
+
+            var row = '<tr>' +
+                '<td>' + wicket.MatchId + '</td>' +
+                '<td>' + wicket.BatsmanId + '</td>' +
+                '<td>' + wicket.WicketTypeId + '</td>' +
+                '</tr>';
+            $('#team2-wickets').append(row);
+        };
+
+       /* $.connection.hub.start().done(function () {
+            console.log('SignalR connected');
+        });*/
+    });
+</script>
+
+
+
+@*=========================================================Batting with Inning========================================================================*@
+@{
+    var battingInning1 = ViewBag.BattingInning1 as List<Vispl.Trainee.CricInfo.VO.BattingVO>;
+    var team1Name = Model["Team1Name"] as string;
+    var team1ShortName = Model["Team1ShortName"] as string;
+    var team2Name = Model["Team2Name"] as string;
+    var team2ShortName = Model["Team2ShortName"] as string;
+    var team1Players = ViewBag.Team1Players as List<Dictionary<string, object>>;
+    var team2Players = ViewBag.Team2Players as List<Dictionary<string, object>>;
+
+    // Separate innings data for team1 and team2
+    var team1BattingData = new List<Vispl.Trainee.CricInfo.VO.BattingVO>();
+    var team2BattingData = new List<Vispl.Trainee.CricInfo.VO.BattingVO>();
+
+    foreach (var battingData in battingInning1)
+    {
+        var playerID = battingData.PlayerId;
+
+        // Determine if the player belongs to team1 or team2
+        var isTeam1Player = team1Players.Any(p => Convert.ToInt32(p["PlayerID"]) == playerID);
+        var isTeam2Player = team2Players.Any(p => Convert.ToInt32(p["PlayerID"]) == playerID);
+
+        if (isTeam1Player)
+        {
+            team1BattingData.Add(battingData);
+        }
+        else if (isTeam2Player)
+        {
+            team2BattingData.Add(battingData);
+        }
+        // Handle cases where player does not belong to either team (if necessary)
+    }
+}
+
+@using Syncfusion.EJ2.Grids
+
+<div id="Batting" style="display: none;">
     <div class="navbar-block">
         <div class="inning-navbar">
             <ul>
-                <li><a href="#" onclick="showInningSection('team1-inning')">Team1 Inning</a></li>
+                <li><a href="#" onclick="showInningSection('team1-inning')">@team1Name Inning</a></li>
             </ul>
         </div>
         <div class="inning-navbar">
             <ul>
-                <li><a href="#" onclick="showInningSection('team2-inning')">Team2 Inning</a></li>
+                <li><a href="#" onclick="showInningSection('team2-inning')">@team2Name Inning</a></li>
             </ul>
         </div>
     </div>
 
     <div class="inning-section" id="team1-inning" style="display:none;">
-        <h3>Team 1 Inning</h3>
-        <table id="team1-battingTable">
-            <thead>
-                <tr>
-                    <th><img src="~/Content/Images/batting.jpg" style="width: 50px; height: 50px;" /> Batting</th>
-                    <th>R</th>
-                    <th>B</th>
-                    <th>4S</th>
-                    <th>6S</th>
-                    <th>S/R</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <h3>@team1ShortName Scores</h3>
+        @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.BattingVO>("team1-battingTable").DataSource((IEnumerable<Vispl.Trainee.CricInfo.VO.BattingVO>)team1BattingData)
+            .Columns(col =>
+            {
+                col.Field("BattingId").HeaderText("Batting ID").Width("150").Add();
+                col.Field("PlayerID").Template("#template1").HeaderText("Player").Width("200").Add();
+                col.Field("Runs").HeaderText("R").Width("100").Add();
+                col.Field("Balls").HeaderText("B").Width("100").Add();
+                col.Field("Fours").HeaderText("4S").Width("100").Add();
+                col.Field("Sixes").HeaderText("6S").Width("100").Add();
+                col.Field("StrikeRate").HeaderText("S/R").Width("100").Add();
+            })
+            .Render())
     </div>
 
     <div class="inning-section" id="team2-inning" style="display:none;">
-        <h3>Team 2 Inning</h3>
-        <table id="team2-battingTable">
-            <thead>
-                <tr>
-                    <th><img src="~/Content/Images/batting.jpg" style="width: 50px; height: 50px;" /> Batting</th>
-                    <th>R</th>
-                    <th>B</th>
-                    <th>4S</th>
-                    <th>6S</th>
-                    <th>S/R</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <h3>@team2ShortName Scores</h3>
+        @(Html.EJS().Grid<Vispl.Trainee.CricInfo.VO.BattingVO>("team2-battingTable").DataSource((IEnumerable<Vispl.Trainee.CricInfo.VO.BattingVO>)team2BattingData)
+            .Columns(col =>
+            {
+                col.Field("BattingId").HeaderText("Batting ID").Width("150").Add();
+                col.Field("PlayerID").Template("#template2").HeaderText("Player").Width("200").Add();
+                col.Field("Runs").HeaderText("R").Width("100").Add();
+                col.Field("Balls").HeaderText("B").Width("100").Add();
+                col.Field("Fours").HeaderText("4S").Width("100").Add();
+                col.Field("Sixes").HeaderText("6S").Width("100").Add();
+                col.Field("StrikeRate").HeaderText("S/R").Width("100").Add();
+            })
+            .Render())
     </div>
 </div>
-
-
 
 
 @*========================================================================Batting with Inning Style=======================================================*@
@@ -628,7 +1044,34 @@
 </style>
 
 @*=============================================Batting with Inning Script=============================================================*@
+
+<script id="template1" type="text/x-template">
+    @{ /* Razor code to embed C# in JavaScript */ }
+    var playerId = parseInt(${PlayerId});
+    var playerName = getPlayerName(playerId, team1Players);
+    if (playerName) {
+    ${PlayerId} = playerName;
+    } else {
+    ${PlayerId} = 'Unknown';
+    }
+</script>
+
+
+<script id="template2" type="text/x-template">
+    @{ /* Razor code to embed C# in JavaScript */ }
+    var playerId = parseInt(${PlayerId});
+    var playerName = getPlayerName(playerId, team2Players);
+    if (playerName) {
+    ${PlayerId} = playerName;
+    } else {
+    ${PlayerId} = 'Unknown';
+    }
+</script>
+
 <script>
+    var team1PlayersData = @Html.Raw(JsonConvert.SerializeObject(team1Players));
+    var team2PlayersData = @Html.Raw(JsonConvert.SerializeObject(team2Players));
+
     function showInningSection(sectionId) {
         var team1Inning = document.getElementById('team1-inning');
         var team2Inning = document.getElementById('team2-inning');
@@ -641,44 +1084,48 @@
             team2Inning.style.display = 'block';
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var team1Grid = document.getElementById("team1-battingTable").ej2_instances[0];
+        var team2Grid = document.getElementById("team2-battingTable").ej2_instances[0];
+
+        if (team1Grid && @Html.Raw(JsonConvert.SerializeObject(team1BattingData)) !== null) {
+            var team1BattingData = @Html.Raw(JsonConvert.SerializeObject(team1BattingData));
+
+            team1BattingData.forEach(function (item) {
+                item.StrikeRate = item.Balls > 0 ? (item.Runs * 100 / item.Balls).toFixed(2) : "0.00";
+                item.PlayerName = getPlayerName(item.PlayerID, team1PlayersData);
+            });
+
+            team1Grid.dataSource = team1BattingData;
+        }
+
+        if (team2Grid && @Html.Raw(JsonConvert.SerializeObject(team2BattingData)) !== null) {
+            var team2BattingData = @Html.Raw(JsonConvert.SerializeObject(team2BattingData));
+
+            team2BattingData.forEach(function (item) {
+                item.StrikeRate = item.Balls > 0 ? (item.Runs * 100 / item.Balls).toFixed(2) : "0.00";
+                item.PlayerName = getPlayerName(item.PlayerID, team2PlayersData);
+            });
+
+            team2Grid.dataSource = team2BattingData;
+        }
+
+        function getPlayerName(playerId, playersList) {
+            var player;
+            playersList.forEach(function(playerData) {
+                if (playerData.PlayerID === playerId) {
+                    player = playerData.Name;
+                }
+            });
+            return player;
+        }
+    });
 </script>
 
-@*<script>
-            document.addEventListener("DOMContentLoaded", function() {
-                var battings = @Html.Raw(ViewBag.BattingsJson);
-
-                var tableBody = document.querySelector("#battingTable tbody");
-
-                battings.forEach(function(batting) {
-                    var row = document.createElement("tr");
-
-                    // Fetch player name from another source if necessary
-                    var playerName = "Player " + batting.PlayerId; // Placeholder for actual player name fetching logic
-
-                    var cells = [
-                        playerName,
-                        batting.Runs,
-                        batting.Balls,
-                        batting.Fours,
-                        batting.Sixes,
-                        batting.StrikeRate.toFixed(2)
-                    ];
-
-                    cells.forEach(function(cellData) {
-                        var cell = document.createElement("td");
-                        cell.textContent = cellData;
-                        row.appendChild(cell);
-                    });
-
-                    tableBody.appendChild(row);
-                });
-            });
-    </script>*@
-
-
 @*=============================================Commentary=============================================================*@
-<div id="Commentary" class="Commentary" style="display: block; background-color: royalblue; height: 200px;">
-    <div id="commentaryContent"></div>
+<div id="Commentary" class="Commentary" style="display: none;">
+    <div id="commentaryContent" style="display: block; color: navy; background-color: rgb(167, 230, 255); height: 200px; "></div>
 </div>
 
 @*====================================================================================================================*@

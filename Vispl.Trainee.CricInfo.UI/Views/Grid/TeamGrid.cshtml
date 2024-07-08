@@ -59,7 +59,7 @@
 @using Syncfusion.EJ2.Grids
 
 <div id="TeamGridContainer">
-    @(Html.EJS().Grid<object>("TeamGrid") .DataSource(teams).Columns(col =>
+    @(Html.EJS().Grid<object>("TeamGrid").DataSource(teams).Columns(col =>
 {
     col.Field("TeamID").HeaderText("Team ID").Width("120").Add();
     col.Field("TeamIcon").HeaderText("Team Icon").TextAlign(Syncfusion.EJ2.Grids.TextAlign.Center).Template("<img src=\"data:image/png;base64,${TeamIcon}\" class=\"pic\" />").Width("150").AllowFiltering(false).Add();

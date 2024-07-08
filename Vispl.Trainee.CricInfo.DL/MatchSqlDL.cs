@@ -376,9 +376,6 @@ WHERE
         }
 
 
-
-
-
         public MatchVO GetMatchByID(int matchId) 
         {
             string query = @"SELECT * FROM Matches WHERE MatchID = @matchId;";
@@ -469,7 +466,6 @@ JOIN
 
             return match;
         }
-
 
 
         public List<Dictionary<string, object>> GetPlayersByTeamID(int teamID)
@@ -708,6 +704,340 @@ JOIN
         }
 
 
+        public bool UpdateBattingStatistics(int playerOnStrikeId, int runs, int balls, int fours, int sixes, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string query = @"
+                    UPDATE Batting 
+                    SET Runs = Runs + @Runs, 
+                        Balls = Balls + @Balls, 
+                        Fours = Fours + @Fours, 
+                        Sixes = Sixes + @Sixes
+                    WHERE PlayerId = @PlayerId;";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Runs", runs);
+                        command.Parameters.AddWithValue("@Balls", balls);
+                        command.Parameters.AddWithValue("@Fours", fours);
+                        command.Parameters.AddWithValue("@Sixes", sixes);
+                        command.Parameters.AddWithValue("@PlayerId", playerOnStrikeId);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return false;
+            }
+        }
+
+
+        public List<BattingVO> GetAllBatting()
+        {
+            List<BattingVO> battings = new List<BattingVO>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT * FROM Batting";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    BattingVO batting = new BattingVO
+                    {
+                        BattingId = (int)reader["BattingId"],
+                        PlayerId = (int)reader["PlayerId"],
+                        MatchId = (int)reader["MatchId"],
+                        Runs = (int)reader["Runs"],
+                        Balls = (int)reader["Balls"],
+                        Fours = (int)reader["Fours"],
+                        Sixes = (int)reader["Sixes"]
+                    };
+                    battings.Add(batting);
+                }
+            }
+
+            return battings;
+        }
+
+
+        public void UpdateScore(BallVO model)
+        {
+            /*using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Handle ball update
+                        int ballId = InsertBall(conn, transaction, model);
+
+                        // Handle ball commentary
+                        InsertBallCommentary(conn, transaction, ballId, model.Commentary);
+
+                        // Handle wicket (if any)
+                        if (!string.IsNullOrEmpty(model.WicketType))
+                        {
+                            InsertFallOfWicket(conn, transaction, model);
+                        }
+
+                        // Update bowling statistics
+                        UpdateBowling(conn, transaction, model);
+
+                        // Update match inning
+                        UpdateMatchInning(conn, transaction, model);
+
+                        // Determine match outcome and result
+                        DetermineMatchOutcome(conn, transaction, model);
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }*/
+        }
+
+        public void UpdateBall(BallVO model)
+        {
+            try
+            {
+                string insertBallQuery = @"
+            INSERT INTO Ball (InningID, OverNumber, BallNumber, BowlerID, BatsmanID, RunsScored, WicketID)
+            VALUES (@InningID, @OverNumber, @BallNumber, @BowlerID, @BatsmanID, @RunsScored, @WicketID)";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(insertBallQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@InningID", model.InningID);
+                        cmd.Parameters.AddWithValue("@OverNumber", model.OverNumber);
+                        cmd.Parameters.AddWithValue("@BallNumber", model.BallNumber);
+                        cmd.Parameters.AddWithValue("@BowlerID", model.BowlerID);
+                        cmd.Parameters.AddWithValue("@BatsmanID", model.BatsmanID);
+                        cmd.Parameters.AddWithValue("@RunsScored", model.RunsScored);
+                        if (model.WicketID == 0)
+                        {
+                            cmd.Parameters.AddWithValue("@WicketID", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@WicketID", model.WicketID);
+                        }
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                throw new Exception("Error updating Ball table: " + ex.Message);
+            }
+        }
+
+
+        public void UpdateBowling(BowlingVO model)
+        {
+            try
+            {
+                string query = @"
+            MERGE INTO Bowling AS Target
+            USING (VALUES (@BowlerID, @TeamID, @MatchID, @TotalOver, @RunsScored, @Maiden, @WicketID, @ECO)) AS Source (BowlerID, TeamID, MatchID, TotalOver, RunsScored, Maiden, WicketID, ECO)
+            ON Target.BowlerID = Source.BowlerID AND Target.MatchID = Source.MatchID
+            WHEN MATCHED THEN
+                UPDATE SET
+                    Target.TotalOver = Source.TotalOver,
+                    Target.RunsScored = Target.RunsScored + Source.RunsScored,
+                    Target.Maiden = Target.Maiden + Source.Maiden,
+                    Target.WicketID = Source.WicketID,
+                    Target.ECO = Source.ECO
+            WHEN NOT MATCHED THEN
+                INSERT (BowlerID, TeamID, MatchID, TotalOver, RunsScored, Maiden, WicketID, ECO)
+                VALUES (Source.BowlerID, Source.TeamID, Source.MatchID, Source.TotalOver, Source.RunsScored, Source.Maiden, Source.WicketID, Source.ECO);";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@BowlerID", model.BowlerID);
+                        cmd.Parameters.AddWithValue("@TeamID", model.TeamID);
+                        cmd.Parameters.AddWithValue("@MatchID", model.MatchID);
+                        cmd.Parameters.AddWithValue("@TotalOver", model.TotalOver);
+                        cmd.Parameters.AddWithValue("@RunsScored", model.RunsScored);
+                        cmd.Parameters.AddWithValue("@Maiden", model.Maiden);
+                        if (model.WicketID == 0)
+                        {
+                            cmd.Parameters.AddWithValue("@WicketID", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@WicketID", model.WicketID);
+                        }
+                        cmd.Parameters.AddWithValue("@ECO", model.ECO);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                throw new Exception("Error updating Bowling table: " + ex.Message);
+            }
+        }
+
+
+        private void InsertBallCommentary(SqlConnection conn, SqlTransaction transaction, int ballId, string commentary)
+        {
+            string insertCommentaryQuery = @"
+                INSERT INTO BallCommentary (BallID, EventDescription)
+                VALUES (@BallID, @EventDescription)";
+
+            SqlCommand cmd = new SqlCommand(insertCommentaryQuery, conn, transaction);
+            cmd.Parameters.AddWithValue("@BallID", ballId);
+            cmd.Parameters.AddWithValue("@EventDescription", commentary);
+            cmd.ExecuteNonQuery();
+        }
+
+        public void UpdateFallOfWicket(WicketVO model)
+        {
+            string insertWicketQuery = @"
+        INSERT INTO fallOfWicket (matchId, batsmanId, bowlerId, fielderId, wicketTypeId)
+        VALUES (@matchId, @batsmanId, @bowlerId, @fielderId, @wicketTypeId)";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        SqlCommand cmd = new SqlCommand(insertWicketQuery, conn, transaction);
+                        cmd.Parameters.AddWithValue("@matchId", model.MatchId);
+                        cmd.Parameters.AddWithValue("@batsmanId", model.BatsmanId);
+                        cmd.Parameters.AddWithValue("@bowlerId", model.BowlerId);
+                        cmd.Parameters.AddWithValue("@fielderId", (object)model.FielderId ?? DBNull.Value); // Handle null fielderId
+                        cmd.Parameters.AddWithValue("@wicketTypeId", model.WicketTypeId);
+
+                        cmd.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        // Handle exception (log it, throw it, etc.)
+                        throw new Exception("Error updating fall of wicket: " + ex.Message);
+                    }
+                }
+            }
+        }
+
+
+
+        public void SaveMatchInning(MatchInningVO model)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                SqlTransaction transaction = conn.BeginTransaction();
+
+                try
+                {
+                    // Insert new inning record
+                    string query = @"
+            INSERT INTO MatchInning (MatchID, InningNumber, BattingTeamID, BowlingTeamID, RunsScored, WicketsLost, OversBowled)
+            VALUES (@MatchID, @InningNumber, @BattingTeamID, @BowlingTeamID, @RunsScored, @WicketsLost, @OversBowled)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@MatchID", model.MatchID);
+                        cmd.Parameters.AddWithValue("@InningNumber", model.InningNumber);
+                        cmd.Parameters.AddWithValue("@BattingTeamID", model.BattingTeamID);
+                        cmd.Parameters.AddWithValue("@BowlingTeamID", model.BowlingTeamID);
+                        cmd.Parameters.AddWithValue("@RunsScored", model.RunsScored);
+                        cmd.Parameters.AddWithValue("@WicketsLost", model.WicketsLost);
+                        cmd.Parameters.AddWithValue("@OversBowled", model.OversBowled);
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Commit the transaction if everything is successful
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    // Rollback the transaction if an error occurs
+                    transaction.Rollback();
+                    throw new Exception("An error occurred while saving the match inning", ex);
+                }
+            }
+        }
+
+        public void UpdateMatchInning(MatchInningVO model)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                SqlTransaction transaction = conn.BeginTransaction();
+
+                try
+                {
+                    string query = @"
+            UPDATE MatchInning
+            SET RunsScored = @RunsScored, WicketsLost = @WicketsLost, OversBowled = @OversBowled
+            WHERE MatchID = @MatchID AND InningNumber = @InningNumber";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@MatchID", model.MatchID);
+                        cmd.Parameters.AddWithValue("@InningNumber", model.InningNumber);
+                        cmd.Parameters.AddWithValue("@RunsScored", model.RunsScored);
+                        cmd.Parameters.AddWithValue("@WicketsLost", model.WicketsLost);
+                        cmd.Parameters.AddWithValue("@OversBowled", model.OversBowled);
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Commit the transaction if everything is successful
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    // Rollback the transaction if an error occurs
+                    transaction.Rollback();
+                    throw new Exception("An error occurred while updating the match inning", ex);
+                }
+            }
+        }
+
+
+        private void DetermineMatchOutcome(SqlConnection conn, SqlTransaction transaction, MatchOutcomeVO model)
+        {
+            // Implement your logic to determine match outcome and result
+            // Example logic to update MatchOutcome and ResultOfMatch tables
+            // Based on the current match state, score, etc.
+        }
 
         private void ReleaseAndDispose(SqlDataReader reader,SqlCommand command = null)
         {

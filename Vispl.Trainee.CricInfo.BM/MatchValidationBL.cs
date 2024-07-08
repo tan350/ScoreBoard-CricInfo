@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -289,6 +290,104 @@ namespace Vispl.Trainee.CricInfo.BM
             {
                 MatchSqlDLObject = null;
             }
+        }
+
+        public bool UpdateBattingStatistics(int playerOnStrikeId, int runs, int balls, int fours, int sixes, out string errorMessage)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                return MatchSqlDLObject.UpdateBattingStatistics(playerOnStrikeId, runs, balls, fours, sixes, out errorMessage);
+            }
+            finally
+            {
+                    MatchSqlDLObject = null;
+            }
+            
+        }
+
+        public void SaveMatchInning(MatchInningVO model)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                MatchSqlDLObject.SaveMatchInning(model);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+
+        }
+
+        public List<BattingVO> GetAllBatting()
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                return MatchSqlDLObject.GetAllBatting();
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+
+        }
+
+        public void UpdateFallOfWicket(WicketVO model)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                MatchSqlDLObject.UpdateFallOfWicket(model);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+
+        }
+
+        public void UpdateMatchInning(MatchInningVO model)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                MatchSqlDLObject.UpdateMatchInning(model);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+
+        }
+
+        public void UpdateBall(BallVO model)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                MatchSqlDLObject.UpdateBall(model);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+
+        }
+
+        public void UpdateBowling(BowlingVO model)
+        {
+            try
+            {
+                MatchSqlDLObject = new MatchSqlDL();
+                MatchSqlDLObject.UpdateBowling(model);
+            }
+            finally
+            {
+                MatchSqlDLObject = null;
+            }
+
         }
     }
 }

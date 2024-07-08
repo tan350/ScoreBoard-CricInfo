@@ -1,4 +1,4 @@
-﻿// Import necessary typings if using SignalR and jQuery in TypeScript
+﻿/*// Import necessary typings if using SignalR and jQuery in TypeScript
 import * as $ from 'jquery';
 import 'signalr';
 
@@ -32,3 +32,4 @@ $(function () {
         console.log('SignalR connected');
     });
 });
+*/

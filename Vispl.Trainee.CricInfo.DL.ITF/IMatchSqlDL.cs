@@ -27,7 +27,13 @@ namespace Vispl.Trainee.CricInfo.DL.ITF
         List<Dictionary<string, object>> GetPlayersByTeamIDAndPlayerType(int teamID, int playerType);
         void SaveWicketData(WicketVO wicket);
         List<WicketVO> GetWicketsByMatchId(int matchId);
-
         void SaveBattingOrder(List<int> team1PlayerIds, List<int> team2PlayerIds, int matchId, int team1Id, int team2Id);
+        bool UpdateBattingStatistics(int playerOnStrikeId, int runs, int balls, int fours, int sixes, out string errorMessage);
+        List<BattingVO> GetAllBatting();
+        void SaveMatchInning(MatchInningVO model);
+        void UpdateFallOfWicket(WicketVO model);
+        void UpdateMatchInning(MatchInningVO model);
+        void UpdateBall(BallVO model);
+        void UpdateBowling(BowlingVO model);
     }
 }
